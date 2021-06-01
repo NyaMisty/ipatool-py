@@ -11,6 +11,9 @@
     },
     "salableAdamId": {
       "type": "string"
+    },
+    "appExtVrsId": {
+      "type": "string"
     }
   },
   "required": [

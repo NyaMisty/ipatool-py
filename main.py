@@ -68,7 +68,7 @@ class IPATool(object):
         self.sess.mount("https://", HTTPAdapter(max_retries=retry_strategy))
         self.sess.mount("http://", HTTPAdapter(max_retries=retry_strategy))
 
-        self.appVerId = None
+        self.appId = None
         self.appInfo = None
         self.jsonOut = None
 
@@ -83,14 +83,23 @@ class IPATool(object):
             logger.fatal("Failed to find app in country %s with ID %s" % (args.country, args.bundle_id))
             return
         appInfo = appInfos.results[0]
-        logger.info("Found app:\n\tName: %s\n\tVersion: %s\n\tAppVerId: %s" % (appInfo.trackName, appInfo.version, appInfo.trackId))
-        self.appVerId = appInfo.trackId
+        logger.info("Found app:\n\tName: %s\n\tVersion: %s\n\tappId: %s" % (appInfo.trackName, appInfo.version, appInfo.trackId))
+        self.appId = appInfo.trackId
         self.appInfo = appInfo
-        self._outputJson({
+
+        ret = {
             "name": appInfo.trackName,
             "version": appInfo.version,
-            "appVerId": appInfo.trackId,
-        })
+            "appId": appInfo.trackId,
+        }
+
+        if args.get_verid:
+            logger.info("Retriving verId using iTunes webpage...")
+            verId = iTunes.getAppVerId(self.appId, args.country)
+            logger.info("Got current verId using iTunes webpage: %s" % verId)
+            ret["appVerId"] = verId
+
+        self._outputJson(ret)
 
     def _login_iTunes(self, Store, appleid, applepass):
         logger.info("Logging into iTunes...")
@@ -99,21 +108,21 @@ class IPATool(object):
         logger.info('Logged in as %s' % Store.accountName)
 
     def handleHistoryVersion(self, args):
-        if not self.appVerId:
-            self.appVerId = args.appVerId
+        if not self.appId:
+            self.appId = args.appId
 
-        if not self.appVerId:
-            logger.fatal("appVerId not supplied!")
+        if not self.appId:
+            logger.fatal("appId not supplied!")
             return
 
-        logger.info('Retriving history version for appVerId %s' % self.appVerId)
+        logger.info('Retriving history version for appId %s' % self.appId)
 
         try:
             Store = StoreClient(self.sess)
             self._login_iTunes(Store, args.appleid, args.password)
 
-            logger.info('Retriving download info for versionId %s' % (self.appVerId))
-            downResp = Store.download(self.appVerId)
+            logger.info('Retriving download info for appId %s' % (self.appId))
+            downResp = Store.download(self.appId)
             if not downResp.songList:
                 logger.fatal("failed to get app download info!")
             downInfo = downResp.songList[0]
@@ -125,29 +134,39 @@ class IPATool(object):
             logger.fatal("Store %s failed! Message: %s%s" % (e.req, e.errMsg, " (errorType %s)" % e.errType if e.errType else ''))
 
     def handleDownload(self, args):
-        if not self.appVerId:
-            self.appVerId = args.appVerId
+        if not self.appId:
+            self.appId = args.appId
 
-        if not self.appVerId:
-            logger.fatal("appVerId not supplied!")
+        if not self.appId:
+            logger.fatal("appId not supplied!")
             return
 
         try:
             appleid = args.appleid
             Store = StoreClient(self.sess)
             self._login_iTunes(Store, args.appleid, args.password)
-
-            logger.info('Retriving download info for versionId %s' % (self.appVerId))
-            downResp = Store.download(self.appVerId)
+            args.appVerId = ""
+            logger.info('Retriving download info for appId %s%s' % (self.appId, " with versionId %s" % args.appVerId if args.appVerId else ""))
+            downResp = Store.download(self.appId, args.appVerId)
             if not downResp.songList:
                 logger.fatal("failed to get app download info!")
             downInfo = downResp.songList[0]
 
-            logger.info('Downloading app with versionId %s' % (self.appVerId))
+            appName = downInfo.metadata.bundleDisplayName
+            appId = downInfo.songId
+            appBundleId = downInfo.metadata.softwareVersionBundleId
+            appVerId = downInfo.metadata.softwareVersionExternalIdentifier
+            appVer = downInfo.metadata.bundleShortVersionString
+
+            logger.info(f'Downloading app {appName} ({appBundleId}) with appId {appId} (version {appVer}, versionId {appVerId})')
+
             if self.appInfo:
-                filename = '%s-%s-%s.ipa' % (self.appInfo.bundleId, self.appInfo.version, self.appVerId)
+                filename = '%s-%s-%s-%s.ipa' % (appBundleId,
+                                                appVer,
+                                                appId,
+                                                appVerId)
             else:
-                filename = '%s.ipa' % (self.appVerId)
+                filename = '%s-%s.ipa' % (self.appId, appVerId)
 
             filepath = os.path.join(args.output_dir, filename)
             logger.info("Downloading ipa to %s" % filepath)
@@ -171,6 +190,7 @@ class IPATool(object):
 
             self._outputJson({
                 "downloadedIPA": filepath,
+                "downloadedVerId": appVerId,
             })
         except StoreException as e:
             logger.fatal("Store %s failed! Message: %s%s" % (e.req, e.errMsg, " (errorType %s)" % e.errType if e.errType else ''))
@@ -181,19 +201,21 @@ def main():
     commparser = argparse.ArgumentParser(description='IPATool-Python Commands.', add_help=False)
     subp = commparser.add_subparsers(dest='command', required=True)
     lookup_p = subp.add_parser('lookup')
-    lookup_p.add_argument('--bundle-id', '-b', dest='bundle_id')
-    lookup_p.add_argument('--country', '-c', dest='country')
+    lookup_p.add_argument('--bundle-id', '-b', dest='bundle_id', required=True)
+    lookup_p.add_argument('--country', '-c', dest='country', required=True)
+    lookup_p.add_argument('--get-verid', dest='get_verid', action='store_true')
     lookup_p.set_defaults(func=tool.handleLookup)
 
     down_p = subp.add_parser('download')
-    down_p.add_argument('--app-version-id', '-i', dest='appVerId')
+    down_p.add_argument('--appId', '-i', dest='appId')
+    #down_p.add_argument('--appVerId', dest='appVerId')
     down_p.add_argument('--appleid', '-e', required=True)
     down_p.add_argument('--password', '-p', required=True)
     down_p.add_argument('--output-dir', '-o', dest='output_dir', default='.')
     down_p.set_defaults(func=tool.handleDownload)
 
     down_p = subp.add_parser('historyver')
-    down_p.add_argument('--app-version-id', '-i', dest='appVerId')
+    down_p.add_argument('--appId', '-i', dest='appId')
     down_p.add_argument('--appleid', '-e', required=True)
     down_p.add_argument('--password', '-p', required=True)
     down_p.set_defaults(func=tool.handleHistoryVersion)

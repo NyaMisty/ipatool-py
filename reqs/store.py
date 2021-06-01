@@ -58,8 +58,8 @@ class StoreClient(object):
     # </plist>
     # ' \
     # https://p25-buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/volumeStoreDownloadProduct?guid=000C2941396Bk
-    def download(self, appVerId):
-        req = StoreDownloadReq(creditDisplay="", guid=self.guid, salableAdamId=appVerId)
+    def download(self, appId, appVerId=""):
+        req = StoreDownloadReq(creditDisplay="", guid=self.guid, salableAdamId=appId, appExtVrsId=appVerId)
         r = self.sess.post("https://p25-buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/volumeStoreDownloadProduct",
                            params={
                                "guid": self.guid
