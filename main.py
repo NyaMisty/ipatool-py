@@ -63,7 +63,7 @@ class IPATool(object):
         retry_strategy = Retry(
             connect=4,
             read=2,
-            other=2,
+            total=8,
         )
         self.sess.mount("https://", HTTPAdapter(max_retries=retry_strategy))
         self.sess.mount("http://", HTTPAdapter(max_retries=retry_strategy))
