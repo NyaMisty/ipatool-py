@@ -1,0 +1,222 @@
+{
+  "title": "iTunes Lookup Resp",
+  "type": "object",
+  "properties": {
+    "resultCount": {
+      "type": "integer"
+    },
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "appletvScreenshotUrls": {
+            "type": "array",
+            "items": {
+              "type": ["number","string","boolean","object","array", "null"]
+            }
+          },
+          "screenshotUrls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "ipadScreenshotUrls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "artworkUrl60": {
+            "type": "string"
+          },
+          "artworkUrl512": {
+            "type": "string"
+          },
+          "artworkUrl100": {
+            "type": "string"
+          },
+          "artistViewUrl": {
+            "type": "string"
+          },
+          "supportedDevices": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "advisories": {
+            "type": "array",
+            "items": {
+              "type": ["number","string","boolean","object","array", "null"]
+            }
+          },
+          "isGameCenterEnabled": {
+            "type": "boolean"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "features": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "minimumOsVersion": {
+            "type": "string"
+          },
+          "trackCensoredName": {
+            "type": "string"
+          },
+          "languageCodesISO2A": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "fileSizeBytes": {
+            "type": "string"
+          },
+          "formattedPrice": {
+            "type": "string"
+          },
+          "contentAdvisoryRating": {
+            "type": "string"
+          },
+          "averageUserRatingForCurrentVersion": {
+            "type": "number"
+          },
+          "userRatingCountForCurrentVersion": {
+            "type": "integer"
+          },
+          "averageUserRating": {
+            "type": "number"
+          },
+          "trackViewUrl": {
+            "type": "string"
+          },
+          "trackContentRating": {
+            "type": "string"
+          },
+          "releaseDate": {
+            "type": "string"
+          },
+          "genreIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "primaryGenreName": {
+            "type": "string"
+          },
+          "trackId": {
+            "type": "integer"
+          },
+          "trackName": {
+            "type": "string"
+          },
+          "sellerName": {
+            "type": "string"
+          },
+          "isVppDeviceBasedLicensingEnabled": {
+            "type": "boolean"
+          },
+          "currentVersionReleaseDate": {
+            "type": "string"
+          },
+          "releaseNotes": {
+            "type": "string"
+          },
+          "primaryGenreId": {
+            "type": "integer"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "wrapperType": {
+            "type": "string"
+          },
+          "artistId": {
+            "type": "integer"
+          },
+          "artistName": {
+            "type": "string"
+          },
+          "genres": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "price": {
+            "type": "number"
+          },
+          "description": {
+            "type": "string"
+          },
+          "bundleId": {
+            "type": "string"
+          },
+          "userRatingCount": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "appletvScreenshotUrls",
+          "screenshotUrls",
+          "ipadScreenshotUrls",
+          "artworkUrl60",
+          "artworkUrl512",
+          "artworkUrl100",
+          "artistViewUrl",
+          "supportedDevices",
+          "advisories",
+          "isGameCenterEnabled",
+          "kind",
+          "features",
+          "minimumOsVersion",
+          "trackCensoredName",
+          "languageCodesISO2A",
+          "fileSizeBytes",
+          "formattedPrice",
+          "contentAdvisoryRating",
+          "averageUserRatingForCurrentVersion",
+          "userRatingCountForCurrentVersion",
+          "averageUserRating",
+          "trackViewUrl",
+          "trackContentRating",
+          "releaseDate",
+          "genreIds",
+          "primaryGenreName",
+          "trackId",
+          "trackName",
+          "sellerName",
+          "isVppDeviceBasedLicensingEnabled",
+          "currentVersionReleaseDate",
+          "releaseNotes",
+          "primaryGenreId",
+          "currency",
+          "version",
+          "wrapperType",
+          "artistId",
+          "artistName",
+          "genres",
+          "price",
+          "description",
+          "bundleId",
+          "userRatingCount"
+        ]
+      }
+    }
+  },
+  "required": [
+    "resultCount",
+    "results"
+  ]
+}

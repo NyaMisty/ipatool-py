@@ -1,0 +1,497 @@
+{
+  "title": "Store Download Resp",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "pings": {
+      "type": "array",
+      "items": {
+        "type": ["number","string","boolean","object","array", "null"]
+      }
+    },
+    "cancel-purchase-batch": {
+      "type": "boolean"
+    },
+    "customerMessage": {
+      "type": "string"
+    },
+    "failureType": {
+      "type": "string"
+    },
+    "jingleDocType": {
+      "type": "string"
+    },
+    "jingleAction": {
+      "type": "string"
+    },
+    "status": {
+      "type": "integer"
+    },
+    "dsPersonId": {
+      "type": "string"
+    },
+    "creditDisplay": {
+      "type": "string"
+    },
+    "creditBalance": {
+      "type": "string"
+    },
+    "freeSongBalance": {
+      "type": "string"
+    },
+    "authorized": {
+      "type": "boolean"
+    },
+    "download-queue-item-count": {
+      "type": "integer"
+    },
+    "songList": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "songId": {
+            "type": "integer"
+          },
+          "URL": {
+            "type": "string"
+          },
+          "downloadKey": {
+            "type": "string"
+          },
+          "artworkURL": {
+            "type": "string"
+          },
+          "artwork-urls": {
+            "type": "object",
+            "properties": {
+              "image-type": {
+                "type": "string"
+              },
+              "default": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "url"
+                ]
+              }
+            },
+            "required": [
+              "image-type",
+              "default"
+            ]
+          },
+          "md5": {
+            "type": "string"
+          },
+          "chunks": {
+            "type": "object",
+            "properties": {
+              "chunkSize": {
+                "type": "integer"
+              },
+              "hashes": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "chunkSize",
+              "hashes"
+            ]
+          },
+          "isStreamable": {
+            "type": "boolean"
+          },
+          "uncompressedSize": {
+            "type": "string"
+          },
+          "sinfs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer"
+                },
+                "sinf": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "sinf"
+              ]
+            }
+          },
+          "purchaseDate": {
+            "type": "string"
+          },
+          "download-id": {
+            "type": "string"
+          },
+          "is-in-queue": {
+            "type": "boolean"
+          },
+          "asset-info": {
+            "type": "object",
+            "properties": {
+              "file-size": {
+                "type": "integer"
+              },
+              "flavor": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "file-size",
+              "flavor"
+            ]
+          },
+          "metadata": {
+            "type": "object",
+            "properties": {
+              "MacUIRequiredDeviceCapabilities": {
+                "type": "object",
+                "properties": {
+                  "arm64": {
+                    "type": "boolean"
+                  },
+                  "gamekit": {
+                    "type": "boolean"
+                  },
+                  "metal": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "arm64",
+                  "gamekit",
+                  "metal"
+                ]
+              },
+              "UIRequiredDeviceCapabilities": {
+                "type": "object",
+                "properties": {
+                  "arm64": {
+                    "type": "boolean"
+                  },
+                  "gamekit": {
+                    "type": "boolean"
+                  },
+                  "metal": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "arm64",
+                  "gamekit",
+                  "metal"
+                ]
+              },
+              "artistId": {
+                "type": "integer"
+              },
+              "artistName": {
+                "type": "string"
+              },
+              "bundleDisplayName": {
+                "type": "string"
+              },
+              "bundleShortVersionString": {
+                "type": "string"
+              },
+              "bundleVersion": {
+                "type": "string"
+              },
+              "copyright": {
+                "type": "string"
+              },
+              "fileExtension": {
+                "type": "string"
+              },
+              "gameCenterEnabled": {
+                "type": "boolean"
+              },
+              "gameCenterEverEnabled": {
+                "type": "boolean"
+              },
+              "genre": {
+                "type": "string"
+              },
+              "genreId": {
+                "type": "integer"
+              },
+              "itemId": {
+                "type": "integer"
+              },
+              "itemName": {
+                "type": "string"
+              },
+              "kind": {
+                "type": "string"
+              },
+              "playlistName": {
+                "type": "string"
+              },
+              "product-type": {
+                "type": "string"
+              },
+              "rating": {
+                "type": "object",
+                "properties": {
+                  "content": {
+                    "type": "string"
+                  },
+                  "label": {
+                    "type": "string"
+                  },
+                  "rank": {
+                    "type": "integer"
+                  },
+                  "system": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "content",
+                  "label",
+                  "rank",
+                  "system"
+                ]
+              },
+              "releaseDate": {
+                "type": "string"
+              },
+              "requiresRosetta": {
+                "type": "boolean"
+              },
+              "runsOnAppleSilicon": {
+                "type": "boolean"
+              },
+              "runsOnIntel": {
+                "type": "boolean"
+              },
+              "s": {
+                "type": "integer"
+              },
+              "software-platform": {
+                "type": "string"
+              },
+              "softwareIcon57x57URL": {
+                "type": "string"
+              },
+              "softwareIconNeedsShine": {
+                "type": "boolean"
+              },
+              "softwareSupportedDeviceIds": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              },
+              "softwareVersionBundleId": {
+                "type": "string"
+              },
+              "softwareVersionExternalIdentifier": {
+                "type": "integer"
+              },
+              "softwareVersionExternalIdentifiers": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              },
+              "subgenres": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "genre": {
+                      "type": "string"
+                    },
+                    "genreId": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "genre",
+                    "genreId"
+                  ]
+                }
+              },
+              "vendorId": {
+                "type": "integer"
+              },
+              "drmVersionNumber": {
+                "type": "integer"
+              },
+              "versionRestrictions": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "MacUIRequiredDeviceCapabilities",
+              "UIRequiredDeviceCapabilities",
+              "artistId",
+              "artistName",
+              "bundleDisplayName",
+              "bundleShortVersionString",
+              "bundleVersion",
+              "copyright",
+              "fileExtension",
+              "gameCenterEnabled",
+              "gameCenterEverEnabled",
+              "genre",
+              "genreId",
+              "itemId",
+              "itemName",
+              "kind",
+              "playlistName",
+              "product-type",
+              "rating",
+              "releaseDate",
+              "requiresRosetta",
+              "runsOnAppleSilicon",
+              "runsOnIntel",
+              "s",
+              "software-platform",
+              "softwareIcon57x57URL",
+              "softwareIconNeedsShine",
+              "softwareSupportedDeviceIds",
+              "softwareVersionBundleId",
+              "softwareVersionExternalIdentifier",
+              "softwareVersionExternalIdentifiers",
+              "subgenres",
+              "vendorId",
+              "drmVersionNumber",
+              "versionRestrictions"
+            ]
+          }
+        },
+        "required": [
+          "songId",
+          "URL",
+          "downloadKey",
+          "artworkURL",
+          "artwork-urls",
+          "md5",
+          "chunks",
+          "isStreamable",
+          "uncompressedSize",
+          "sinfs",
+          "purchaseDate",
+          "download-id",
+          "is-in-queue",
+          "asset-info",
+          "metadata"
+        ]
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "itemIds": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "currency": {
+          "type": "string"
+        },
+        "exchangeRateToUSD": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "itemIds",
+        "currency",
+        "exchangeRateToUSD"
+      ]
+    },
+    "subscriptionStatus": {
+      "type": "object",
+      "properties": {
+        "terms": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string"
+              },
+              "latestTerms": {
+                "type": "integer"
+              },
+              "agreedToTerms": {
+                "type": "integer"
+              },
+              "source": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "type",
+              "latestTerms",
+              "agreedToTerms",
+              "source"
+            ]
+          }
+        },
+        "account": {
+          "type": "object",
+          "properties": {
+            "isMinor": {
+              "type": "boolean"
+            },
+            "suspectUnderage": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "isMinor",
+            "suspectUnderage"
+          ]
+        },
+        "family": {
+          "type": "object",
+          "properties": {
+            "hasFamily": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "hasFamily"
+          ]
+        }
+      },
+      "required": [
+        "terms",
+        "account",
+        "family"
+      ]
+    }
+  },
+  "required": [
+    "pings",
+    "jingleDocType",
+    "jingleAction",
+    "status",
+    "dsPersonId",
+    "creditDisplay",
+    "creditBalance",
+    "freeSongBalance",
+    "authorized",
+    "download-queue-item-count",
+    "songList",
+    "metrics",
+    "subscriptionStatus"
+  ]
+}

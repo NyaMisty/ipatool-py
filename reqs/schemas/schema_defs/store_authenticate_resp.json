@@ -1,0 +1,324 @@
+{
+  "title": "Store Authenticate Resp",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "pings": {
+      "type": "array",
+      "items": {
+        "type": ["number","string","boolean","object","array", "null"]
+      }
+    },
+    "cancel-purchase-batch": {
+      "type": "boolean"
+    },
+    "customerMessage": {
+      "type": "string"
+    },
+    "failureType": {
+      "type": "string"
+    },
+    "accountInfo": {
+      "type": "object",
+      "properties": {
+        "appleId": {
+          "type": "string"
+        },
+        "address": {
+          "type": "object",
+          "properties": {
+            "firstName": {
+              "type": "string"
+            },
+            "lastName": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "firstName",
+            "lastName"
+          ]
+        }
+      },
+      "required": [
+        "appleId",
+        "address"
+      ]
+    },
+    "passwordToken": {
+      "type": "string"
+    },
+    "clearToken": {
+      "type": "string"
+    },
+    "m-allowed": {
+      "type": "boolean"
+    },
+    "is-cloud-enabled": {
+      "type": "string"
+    },
+    "dsPersonId": {
+      "type": "string"
+    },
+    "creditDisplay": {
+      "type": "string"
+    },
+    "creditBalance": {
+      "type": "string"
+    },
+    "freeSongBalance": {
+      "type": "string"
+    },
+    "isManagedStudent": {
+      "type": "boolean"
+    },
+    "action": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind"
+      ]
+    },
+    "subscriptionStatus": {
+      "type": "object",
+      "properties": {
+        "terms": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string"
+              },
+              "latestTerms": {
+                "type": "integer"
+              },
+              "agreedToTerms": {
+                "type": "integer"
+              },
+              "source": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "type",
+              "latestTerms",
+              "agreedToTerms",
+              "source"
+            ]
+          }
+        },
+        "account": {
+          "type": "object",
+          "properties": {
+            "isMinor": {
+              "type": "boolean"
+            },
+            "suspectUnderage": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "isMinor",
+            "suspectUnderage"
+          ]
+        },
+        "family": {
+          "type": "object",
+          "properties": {
+            "hasFamily": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "hasFamily"
+          ]
+        }
+      },
+      "required": [
+        "terms",
+        "account",
+        "family"
+      ]
+    },
+    "accountFlags": {
+      "type": "object",
+      "properties": {
+        "personalization": {
+          "type": "boolean"
+        },
+        "underThirteen": {
+          "type": "boolean"
+        },
+        "identityLastVerified": {
+          "type": "integer"
+        },
+        "verifiedExpirationDate": {
+          "type": "integer"
+        },
+        "retailDemo": {
+          "type": "boolean"
+        },
+        "autoPlay": {
+          "type": "boolean"
+        },
+        "isDisabledAccount": {
+          "type": "boolean"
+        },
+        "isRestrictedAccount": {
+          "type": "boolean"
+        },
+        "isManagedAccount": {
+          "type": "boolean"
+        },
+        "isInRestrictedRegion": {
+          "type": "boolean"
+        },
+        "accountFlagsVersion": {
+          "type": "integer"
+        },
+        "hasAgreedToTerms": {
+          "type": "boolean"
+        },
+        "hasAgreedToAppClipTerms": {
+          "type": "boolean"
+        },
+        "hasWatchHardwareOffer": {
+          "type": "boolean"
+        },
+        "isInFamily": {
+          "type": "boolean"
+        },
+        "hasSubscriptionFamilySharingEnabled": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "personalization",
+        "underThirteen",
+        "identityLastVerified",
+        "verifiedExpirationDate",
+        "retailDemo",
+        "autoPlay",
+        "isDisabledAccount",
+        "isRestrictedAccount",
+        "isManagedAccount",
+        "isInRestrictedRegion",
+        "accountFlagsVersion",
+        "hasAgreedToTerms",
+        "hasAgreedToAppClipTerms",
+        "hasWatchHardwareOffer",
+        "isInFamily",
+        "hasSubscriptionFamilySharingEnabled"
+      ]
+    },
+    "status": {
+      "type": "integer"
+    },
+    "download-queue-info": {
+      "type": "object",
+      "properties": {
+        "download-queue-item-count": {
+          "type": "integer"
+        },
+        "dsid": {
+          "type": "integer"
+        },
+        "is-auto-download-machine": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "download-queue-item-count",
+        "dsid",
+        "is-auto-download-machine"
+      ]
+    },
+    "privacyAcknowledgement": {
+      "type": "object",
+      "properties": {
+        "com.apple.onboarding.appstore": {
+          "type": "integer"
+        },
+        "com.apple.onboarding.applemusic": {
+          "type": "integer"
+        },
+        "com.apple.onboarding.videos": {
+          "type": "integer"
+        },
+        "com.apple.onboarding.itunesstore": {
+          "type": "integer"
+        },
+        "com.apple.onboarding.itunesu": {
+          "type": "integer"
+        },
+        "com.apple.onboarding.applearcade": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "com.apple.onboarding.appstore",
+        "com.apple.onboarding.applemusic",
+        "com.apple.onboarding.videos",
+        "com.apple.onboarding.itunesstore",
+        "com.apple.onboarding.itunesu",
+        "com.apple.onboarding.applearcade"
+      ]
+    },
+    "dialog": {
+      "type": "object",
+      "properties": {
+        "m-allowed": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": "string"
+        },
+        "explanation": {
+          "type": "string"
+        },
+        "defaultButton": {
+          "type": "string"
+        },
+        "okButtonString": {
+          "type": "string"
+        },
+        "initialCheckboxValue": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "m-allowed",
+        "message",
+        "explanation",
+        "defaultButton",
+        "okButtonString",
+        "initialCheckboxValue"
+      ]
+    }
+  },
+  "required": [
+    "pings",
+    "accountInfo",
+    "passwordToken",
+    "clearToken",
+    "m-allowed",
+    "is-cloud-enabled",
+    "dsPersonId",
+    "creditDisplay",
+    "creditBalance",
+    "freeSongBalance",
+    "isManagedStudent",
+    "action",
+    "subscriptionStatus",
+    "accountFlags",
+    "status",
+    "download-queue-info",
+    "privacyAcknowledgement",
+    "dialog"
+  ]
+}
