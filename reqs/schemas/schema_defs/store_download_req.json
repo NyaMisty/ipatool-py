@@ -1,0 +1,21 @@
+{
+  "title": "Store Download Req",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "creditDisplay": {
+      "type": "string"
+    },
+    "guid": {
+      "type": "string"
+    },
+    "salableAdamId": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "creditDisplay",
+    "guid",
+    "salableAdamId"
+  ]
+}

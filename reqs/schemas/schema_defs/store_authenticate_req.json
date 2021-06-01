@@ -1,0 +1,37 @@
+{
+  "title": "Store Authenticate Req",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "appleId": {
+      "type": "string"
+    },
+    "attempt": {
+      "type": "string"
+    },
+    "createSession": {
+      "type": "string"
+    },
+    "guid": {
+      "type": "string"
+    },
+    "password": {
+      "type": "string"
+    },
+    "rmp": {
+      "type": "string"
+    },
+    "why": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "appleId",
+    "attempt",
+    "createSession",
+    "guid",
+    "password",
+    "rmp",
+    "why"
+  ]
+}
