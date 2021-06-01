@@ -25,12 +25,18 @@ class StoreClient(object):
 
     def authenticate(self, appleId, password):
         req = StoreAuthenticateReq(appleId=appleId, password=password, attempt='4', createSession="true", guid=self.guid, rmp='0', why='signIn')
-        r = self.sess.post("https://p46-buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/authenticate?guid=%s" % self.guid,
-                  headers={
-                      "Accept": "*/*",
-                      "Content-Type": "application/x-www-form-urlencoded",
-                      "User-Agent": "Configurator/2.0 (Macintosh; OS X 10.12.6; 16G29) AppleWebKit/2603.3.8",
-                  }, data=plistlib.dumps(req.as_dict()))
+        url = "https://p46-buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/authenticate?guid=%s" % self.guid
+        while True:
+            r = self.sess.post(url,
+                      headers={
+                          "Accept": "*/*",
+                          "Content-Type": "application/x-www-form-urlencoded",
+                          "User-Agent": "Configurator/2.0 (Macintosh; OS X 10.12.6; 16G29) AppleWebKit/2603.3.8",
+                      }, data=plistlib.dumps(req.as_dict()), allow_redirects=False)
+            if r.status_code == 302:
+                url = r.headers['Location']
+                continue
+            break
         resp = StoreAuthenticateResp.from_dict(plistlib.loads(r.content))
         if not resp.m_allowed:
             raise StoreException("authenticate", resp.customerMessage, resp.failureType)
