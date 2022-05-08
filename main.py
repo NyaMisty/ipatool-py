@@ -84,14 +84,21 @@ class IPATool(object):
         lookup_p.set_defaults(func=self.handleLookup)
 
         def add_auth_options(p):
-            auth_p = p.add_mutually_exclusive_group(required=True)
-            appleID_p = auth_p.add_argument_group('Apple ID Information')
-            appleID_p.add_argument('--appleid', '-e', required=True)
-            appleID_p.add_argument('--password', '-p', required=True)
+            auth_p = p.add_argument_group('Auth Options', 'Must specify either Apple ID & Password, or iTunes Server URL')
+            appleid = auth_p.add_argument('--appleid', '-e')
+            passwd = auth_p.add_argument('--password', '-p')
+            itunessrv = auth_p.add_argument('--itunes-server', '-s', dest='itunes_server')
 
-            auth_p.add_argument('--itunes-server', '-s', dest='itunes_server')
-            
-        
+            ## Multiple hack here just to achieve (appleid & password) || itunes_server
+            # p._optionals.conflict_handler = 'ignore'
+            # p._optionals._handle_conflict_ignore = lambda *args: None
+            auth_p = p.add_mutually_exclusive_group(required=True)
+            auth_p._group_actions.append(appleid)
+            auth_p._group_actions.append(itunessrv)
+
+            auth_p = p.add_mutually_exclusive_group(required=True)
+            auth_p._group_actions.append(passwd)
+            auth_p._group_actions.append(itunessrv)
 
         down_p = subp.add_parser('download')
         add_auth_options(down_p)
@@ -112,9 +119,11 @@ class IPATool(object):
         parser.add_argument('--json', dest='out_json', action='store_true',
                             help='output json in stdout (log will always be put into stderr)')
         
+        # parse global flags & first comm's arguments
         args, rest = parser.parse_known_args()
         logging.getLogger().setLevel(args.log_level.upper())
         outJson = args.out_json
+
         while True:
             args.func(args)
             if not rest:
