@@ -69,8 +69,60 @@ class IPATool(object):
         self.sess.mount("http://", HTTPAdapter(max_retries=retry_strategy))
 
         self.appId = None
-        self.appInfo = None
+        # self.appInfo = None
+        self.appVerId = None
+        
         self.jsonOut = None
+    
+    def tool_main(self):
+        commparser = argparse.ArgumentParser(description='IPATool-Python Commands.', add_help=False)
+        subp = commparser.add_subparsers(dest='command', required=True)
+        lookup_p = subp.add_parser('lookup')
+        lookup_p.add_argument('--bundle-id', '-b', dest='bundle_id', required=True)
+        lookup_p.add_argument('--country', '-c', dest='country', required=True)
+        lookup_p.add_argument('--get-verid', dest='get_verid', action='store_true')
+        lookup_p.set_defaults(func=self.handleLookup)
+
+        def add_auth_options(p):
+            auth_p = p.add_mutually_exclusive_group(required=True)
+            appleID_p = auth_p.add_argument_group('Apple ID Information')
+            appleID_p.add_argument('--appleid', '-e', required=True)
+            appleID_p.add_argument('--password', '-p', required=True)
+
+            auth_p.add_argument('--itunes-server', '-s', dest='itunes_server')
+            
+        
+
+        down_p = subp.add_parser('download')
+        add_auth_options(down_p)
+        down_p.add_argument('--appId', '-i', dest='appId')
+        down_p.add_argument('--appVerId', dest='appVerId')
+
+        down_p.add_argument('--output-dir', '-o', dest='output_dir', default='.')
+        down_p.set_defaults(func=self.handleDownload)
+
+        his_p = subp.add_parser('historyver')
+        his_p.add_argument('--appId', '-i', dest='appId')
+        add_auth_options(his_p)
+        his_p.set_defaults(func=self.handleHistoryVersion)
+
+        parser = argparse.ArgumentParser(description='IPATool-Python.', parents=[commparser])
+        parser.add_argument('--log-level', '-l', dest='log_level', default='info',
+                            help='output level (default: info)')
+        parser.add_argument('--json', dest='out_json', action='store_true',
+                            help='output json in stdout (log will always be put into stderr)')
+        
+        args, rest = parser.parse_known_args()
+        logging.getLogger().setLevel(args.log_level.upper())
+        outJson = args.out_json
+        while True:
+            args.func(args)
+            if not rest:
+                break
+            args, rest = commparser.parse_known_args(rest)
+
+        if outJson and self.jsonOut:
+            print(json.dumps(self.jsonOut, ensure_ascii=False))
 
     def _outputJson(self, obj):
         self.jsonOut = obj
@@ -85,7 +137,7 @@ class IPATool(object):
         appInfo = appInfos.results[0]
         logger.info("Found app:\n\tName: %s\n\tVersion: %s\n\tappId: %s" % (appInfo.trackName, appInfo.version, appInfo.trackId))
         self.appId = appInfo.trackId
-        self.appInfo = appInfo
+        # self.appInfo = appInfo
 
         ret = {
             "name": appInfo.trackName,
@@ -101,14 +153,42 @@ class IPATool(object):
 
         self._outputJson(ret)
 
-    def _login_iTunes(self, Store, appleid, applepass):
-        logger.info("Logging into iTunes...")
+    def _get_StoreClient(self, args):
+        Store = StoreClient(self.sess)
 
-        Store.authenticate(appleid, applepass)
-        logger.info('Logged in as %s' % Store.accountName)
+        if args.itunes_server:
+            logger.info("Using iTunes interface %s to download app!" % args.itunes_server)
+            servUrl = args.itunes_server
+            def handle_iTunes_provider(url):
+                r = requests.get(servUrl, params={
+                    'url': url
+                })
+                ret = r.json()
+                kbsync = bytes.fromhex(ret.pop('kbsync'))
+                guid = ret.pop('guid')
+                retHdrs = ret.pop('headers')
+                return {
+                    'headers': retHdrs,
+                    'kbsync': kbsync,
+                    'guid': guid,
+                }
+            Store.iTunes_provider = handle_iTunes_provider
+        else:
+            appleid = args.appleid
+            applepass = args.password
+
+            logger.info("Logging into iTunes...")
+
+            if appleid.lower() == 'itunes':
+                logger.info("Using iTunes interface to download app!")
+                Store.authenticate(appleid, applepass)
+            else:
+                Store.authenticate(appleid, applepass)
+            logger.info('Logged in as %s' % Store.accountName)
+        return Store
 
     def handleHistoryVersion(self, args):
-        if not self.appId:
+        if args.appId:
             self.appId = args.appId
 
         if not self.appId:
@@ -118,11 +198,11 @@ class IPATool(object):
         logger.info('Retriving history version for appId %s' % self.appId)
 
         try:
-            Store = StoreClient(self.sess)
-            self._login_iTunes(Store, args.appleid, args.password)
+            Store = self._get_StoreClient(args)
 
             logger.info('Retriving download info for appId %s' % (self.appId))
             downResp = Store.download(self.appId)
+            
             if not downResp.songList:
                 logger.fatal("failed to get app download info!")
             downInfo = downResp.songList[0]
@@ -134,20 +214,23 @@ class IPATool(object):
             logger.fatal("Store %s failed! Message: %s%s" % (e.req, e.errMsg, " (errorType %s)" % e.errType if e.errType else ''))
 
     def handleDownload(self, args):
-        if not self.appId:
+        if args.appId:
             self.appId = args.appId
+        if args.appVerId:
+            self.appVerId = args.appVerId
 
         if not self.appId:
             logger.fatal("appId not supplied!")
             return
-
+        
         try:
             appleid = args.appleid
-            Store = StoreClient(self.sess)
-            self._login_iTunes(Store, args.appleid, args.password)
-            args.appVerId = ""
-            logger.info('Retriving download info for appId %s%s' % (self.appId, " with versionId %s" % args.appVerId if args.appVerId else ""))
-            downResp = Store.download(self.appId, args.appVerId)
+            Store = self._get_StoreClient(args)
+            
+            logger.info('Retriving download info for appId %s%s' % (self.appId, " with versionId %s" % self.appVerId if self.appVerId else ""))
+
+            downResp = Store.download(self.appId, self.appVerId)
+            
             if not downResp.songList:
                 logger.fatal("failed to get app download info!")
             downInfo = downResp.songList[0]
@@ -160,13 +243,13 @@ class IPATool(object):
 
             logger.info(f'Downloading app {appName} ({appBundleId}) with appId {appId} (version {appVer}, versionId {appVerId})')
 
-            if self.appInfo:
-                filename = '%s-%s-%s-%s.ipa' % (appBundleId,
-                                                appVer,
-                                                appId,
-                                                appVerId)
-            else:
-                filename = '%s-%s.ipa' % (self.appId, appVerId)
+            # if self.appInfo:
+            filename = '%s-%s-%s-%s.ipa' % (appBundleId,
+                                            appVer,
+                                            appId,
+                                            appVerId)
+            # else:
+            #     filename = '%s-%s.ipa' % (self.appId, appVerId)
 
             filepath = os.path.join(args.output_dir, filename)
             logger.info("Downloading ipa to %s" % filepath)
@@ -189,6 +272,12 @@ class IPATool(object):
                     ipaFile.writestr(appContentDir + '/' + sinfPath, sinfs[i])
 
             self._outputJson({
+                "appName": appName,
+                "appBundleId": appBundleId,
+                "appVer": appVer,
+                "appId": appId,
+                "appVerId": appVerId,
+
                 "downloadedIPA": filepath,
                 "downloadedVerId": appVerId,
             })
@@ -198,44 +287,6 @@ class IPATool(object):
 def main():
     tool = IPATool()
 
-    commparser = argparse.ArgumentParser(description='IPATool-Python Commands.', add_help=False)
-    subp = commparser.add_subparsers(dest='command', required=True)
-    lookup_p = subp.add_parser('lookup')
-    lookup_p.add_argument('--bundle-id', '-b', dest='bundle_id', required=True)
-    lookup_p.add_argument('--country', '-c', dest='country', required=True)
-    lookup_p.add_argument('--get-verid', dest='get_verid', action='store_true')
-    lookup_p.set_defaults(func=tool.handleLookup)
-
-    down_p = subp.add_parser('download')
-    down_p.add_argument('--appId', '-i', dest='appId')
-    #down_p.add_argument('--appVerId', dest='appVerId')
-    down_p.add_argument('--appleid', '-e', required=True)
-    down_p.add_argument('--password', '-p', required=True)
-    down_p.add_argument('--output-dir', '-o', dest='output_dir', default='.')
-    down_p.set_defaults(func=tool.handleDownload)
-
-    down_p = subp.add_parser('historyver')
-    down_p.add_argument('--appId', '-i', dest='appId')
-    down_p.add_argument('--appleid', '-e', required=True)
-    down_p.add_argument('--password', '-p', required=True)
-    down_p.set_defaults(func=tool.handleHistoryVersion)
-
-    parser = argparse.ArgumentParser(description='IPATool-Python.', parents=[commparser])
-    parser.add_argument('--log-level', '-l', dest='log_level', default='info',
-                        help='output level (default: info)')
-    parser.add_argument('--json', dest='out_json', action='store_true',
-                        help='output json in stdout (log will always be put into stderr)')
-
-    args, rest = parser.parse_known_args()
-    logging.getLogger().setLevel(args.log_level.upper())
-    outJson = args.out_json
-    while True:
-        args.func(args)
-        if not rest:
-            break
-        args, rest = commparser.parse_known_args(rest)
-
-    if outJson and tool.jsonOut:
-        print(json.dumps(tool.jsonOut, ensure_ascii=False))
+    tool.tool_main()
 
 main()

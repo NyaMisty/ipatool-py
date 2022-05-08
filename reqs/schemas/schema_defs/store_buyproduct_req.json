@@ -1,0 +1,96 @@
+{
+  "title": "Store BuyProduct Req",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "ageCheck": {
+      "type": "string"
+    },
+    "appExtVrsId": {
+      "type": "string"
+    },
+    "guid": {
+      "type": "string"
+    },
+    "hasBeenAuthedForBuy": {
+      "type": "string"
+    },
+    "isInApp": {
+      "type": "string"
+    },
+    "kbsync": {
+      "type": "string"
+    },
+    "machineName": {
+      "type": "string"
+    },
+    "mtApp": {
+      "type": "string"
+    },
+    "mtClientId": {
+      "type": "string"
+    },
+    "mtEventTime": {
+      "type": "string"
+    },
+    "mtPageId": {
+      "type": "string"
+    },
+    "mtPageType": {
+      "type": "string"
+    },
+    "mtPrevPage": {
+      "type": "string"
+    },
+    "mtRequestId": {
+      "type": "string"
+    },
+    "mtTopic": {
+      "type": "string"
+    },
+    "needDiv": {
+      "type": "string"
+    },
+    "pg": {
+      "type": "string"
+    },
+    "price": {
+      "type": "string"
+    },
+    "pricingParameters": {
+      "type": "string"
+    },
+    "productType": {
+      "type": "string"
+    },
+    "salableAdamId": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "guid",
+    "kbsync",
+    "price",
+    "pricingParameters",
+    "productType",
+    "salableAdamId",
+    "appExtVrsId"
+  ],
+  "optional": [
+    "ageCheck",
+    "hasBeenAuthedForBuy",
+    "isInApp",
+    
+    "machineName",
+    "mtApp",
+    "mtClientId",
+    "mtEventTime",
+    "mtPageId",
+    "mtPageType",
+    "mtPrevPage",
+    "mtRequestId",
+    "mtTopic",
+    "needDiv",
+    "pg"
+  ]
+}

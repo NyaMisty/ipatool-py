@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plist version="1.0">
+<dict>
+	<key>appExtVrsId</key>
+	<string>848463733</string>
+	<key>guid</key>
+	<string>22330C8C.C2E39C5C.06C40B91.D0990F95.9A890F9D.AB7F7EB4.56507025</string>
+	<key>kbsync</key>
+	<data>
+	AAQAA5nBc3Q7ETi+TD1x8AM4wbw9sqWglXBaXwuIrlMR9OnAPY89zaoTvbe6PneuS1x1
+	31NxVIqrAsIZLmxy5be8dQtq8je/rtYTRlxduU9NwW4DBcplBx6vs9qhS3Y8B45Zz4T5
+	dkmDG4UnS7xnAPwew7jEX/uY38zZhtKu4IN+sl/Whvyh2SkZg/5vGCtjav17CGbP8ZWo
+	Ci3FhEqAByOL0g6zhPdTHyqF84Apg9fh395tGpzzAWB8mYsRQXJcUHH1cuJjO/qMTkZ4
+	ZxIJqfMaDJpS20nFq+/Bfg9FvC/83AOPnDfXZTsol3PFKqQ6sLgz6dKIho4Qd2UPABnj
+	kBx4TFPeYBlm2T6GKfi8tr+rDhsMrbNczpnaUS+3cesIOvDsE3YCX4isOmMtg5yrJ5pi
+	2GHuofHD2I7Dj6fOh79I7F5OZb71PUvbeABjxvS5b57LGNICSBc/GJ0CEja27kpYals+
+	bgYG0rVm+vqlAHwRpka5jzeK8DLrvTr22vtBLv62LpTVpVVglr5nbk99BcXG5gA=
+	</data>
+	<key>machineName</key>
+	<string>DESKTOP-697LVJS</string>
+	<key>mtApp</key>
+	<string>com.apple.iTunes</string>
+	<key>mtClientId</key>
+	<string>3z21abvCzFDuz5CYz9bdz19maFVKge</string>
+	<key>mtEventTime</key>
+	<string>1652006678827</string>
+	<key>mtPageId</key>
+	<string>ccfce0ef-4ac8-4d5a-8e5f-79876ac474a4</string>
+	<key>mtPageType</key>
+	<string>Search</string>
+	<key>mtPrevPage</key>
+	<string>Purchases</string>
+	<key>mtRequestId</key>
+	<string>3z21abvCzFDuz5CYz9bdz19maFVKgezL2X64FFVz1MGG</string>
+	<key>mtTopic</key>
+	<string>xp_its_main</string>
+	<key>needDiv</key>
+	<string>0</string>
+	<key>pg</key>
+	<string>default</string>
+	<key>price</key>
+	<string>0</string>
+	<key>pricingParameters</key>
+	<string>STDQ</string>
+	<key>productType</key>
+	<string>C</string>
+	<key>salableAdamId</key>
+	<string>444934666</string>
+</dict>
+</plist>
+
+<?xml version="1.0" encoding="UTF-8"?>
+<plist version="1.0">
+<dict>
+	<key>ageCheck</key>
+	<string>true</string>
+	<key>appExtVrsId</key>
+	<string>848463733</string>
+	<key>guid</key>
+	<string>22330C8C.C2E39C5C.06C40B91.D0990F95.9A890F9D.AB7F7EB4.56507025</string>
+	<key>hasBeenAuthedForBuy</key>
+	<string>true</string>
+	<key>isInApp</key>
+	<string>false</string>
+	<key>kbsync</key>
+	<data>
+	AAQAA1c+HfGD4vNLZJYBMpBucSo1bxeaeTEZ3FGUKLq0skmzTxVik6IGoQMGaP6OWsJU
+	lBoDb3hxaacD57bkiAgRXc/vr21/CipX55hKLoTE53yah3DwBR9tS1cG7oaHFLIh1Vmn
+	RV7G9LJCQqwSAbr4ugEIVmLULkqaHDfTm8VNDXxYej1p8ghKggMcBT0se5cpDqpVn/bE
+	qehnOl6QsupUNjjLzDm58bmERm/AjGJVBHQveG+4Y+Y4e1eUO6QQcntmypjmSLDqhI60
+	31rCV3zwTTZrHmmXEwsZiGgYlSVHR3ne+O9BE+LIPiQxDwIMvjfV6SrzoOUOLlOKvBsk
+	kI29+6H0QNyMUXojWPQf7bfr+9NBTMgJoDNJd5hEGHqiSKnp9V1ALU8S8QwcYzi3ZDPu
+	A36lMtgMOFEnYibnGnP5S8i2t43ZSBglExE9LGTGO0/IEWX9gEhKjvMDuIwMt9zdtpye
+	CXO8siqHY4MtmLlfwZZc/480ZSHfRF8ZQHBa0J0/pgByNQiNe9KMihz+QN7cQI4=
+	</data>
+	<key>machineName</key>
+	<string>DESKTOP-697LVJS</string>
+	<key>mtApp</key>
+	<string>com.apple.iTunes</string>
+	<key>mtClientId</key>
+	<string>3z21abvCzFDuz5CYz9bdz19maFVKge</string>
+	<key>mtEventTime</key>
+	<string>1652006678827</string>
+	<key>mtPageId</key>
+	<string>ccfce0ef-4ac8-4d5a-8e5f-79876ac474a4</string>
+	<key>mtPageType</key>
+	<string>Search</string>
+	<key>mtPrevPage</key>
+	<string>Purchases</string>
+	<key>mtRequestId</key>
+	<string>3z21abvCzFDuz5CYz9bdz19maFVKgezL2X64FFVz1MGG</string>
+	<key>mtTopic</key>
+	<string>xp_its_main</string>
+	<key>needDiv</key>
+	<string>0</string>
+	<key>pg</key>
+	<string>default</string>
+	<key>price</key>
+	<string>0</string>
+	<key>pricingParameters</key>
+	<string>STDQ</string>
+	<key>productType</key>
+	<string>C</string>
+	<key>salableAdamId</key>
+	<string>444934666</string>
+</dict>
+</plist>

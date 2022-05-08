@@ -2,6 +2,8 @@ import plistlib
 import requests
 from reqs.schemas.store_authenticate_req import StoreAuthenticateReq
 from reqs.schemas.store_authenticate_resp import StoreAuthenticateResp
+from reqs.schemas.store_buyproduct_req import StoreBuyproductReq
+from reqs.schemas.store_buyproduct_resp import StoreBuyproductResp
 from reqs.schemas.store_download_req import StoreDownloadReq
 from reqs.schemas.store_download_resp import StoreDownloadResp
 
@@ -22,6 +24,7 @@ class StoreClient(object):
         self.dsid = None
         self.storeFront = None
         self.accountName = None
+        self.iTunes_provider = None
 
     def authenticate(self, appleId, password):
         req = StoreAuthenticateReq(appleId=appleId, password=password, attempt='4', createSession="true", guid=self.guid, rmp='0', why='signIn')
@@ -64,7 +67,7 @@ class StoreClient(object):
     # </plist>
     # ' \
     # https://p25-buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/volumeStoreDownloadProduct?guid=000C2941396Bk
-    def download(self, appId, appVerId=""):
+    def volumeStoreDownloadProduct(self, appId, appVerId=""):
         req = StoreDownloadReq(creditDisplay="", guid=self.guid, salableAdamId=appId, appExtVrsId=appVerId)
         r = self.sess.post("https://p25-buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/volumeStoreDownloadProduct",
                            params={
@@ -81,3 +84,45 @@ class StoreClient(object):
         if resp.cancel_purchase_batch:
             raise StoreException("download", resp.customerMessage, resp.failureType)
         return resp
+
+    def buyProduct(self, appId, appVer='', productType='C', pricingParameters='STDRDL'):
+        url = "https://p25-buy.itunes.apple.com/WebObjects/MZBuy.woa/wa/buyProduct"
+        
+        itunes_internal = self.iTunes_provider(url)
+        hdrs = itunes_internal.pop('headers')
+        guid = itunes_internal.pop('guid')
+        kbsync = itunes_internal.pop('kbsync')
+
+        req = StoreBuyproductReq(
+            guid=guid,
+            salableAdamId=appId,
+            appExtVrsId=appVer if appVer else None,
+            
+            price='0',
+            productType=productType,
+            pricingParameters=pricingParameters,
+            
+            ageCheck='true',
+            hasBeenAuthedForBuy='true',
+            isInApp='false',
+        )
+        payload = req.as_dict()
+        # kbsync is bytes, but json schema does not support it, so we have to assign it
+        payload['kbsync'] = kbsync
+
+        hdrs = dict(hdrs)
+        hdrs["Content-Type"] = "application/x-apple-plist"
+
+        r = self.sess.post(url,
+                        headers=hdrs, 
+                        data=plistlib.dumps(payload)
+                        )
+        
+        resp = StoreBuyproductResp.from_dict(plistlib.loads(r.content))
+        return resp
+
+    def download(self, appId, appVer=''):
+        if self.iTunes_provider:
+            return self.buyProduct(appId, appVer)
+        else:
+            return self.volumeStoreDownloadProduct(appId, appVer)
