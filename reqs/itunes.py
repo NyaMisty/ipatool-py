@@ -31,7 +31,11 @@ class iTunesClient(object):
         return ItunesLookupResp.from_dict(r.json())
 
     def getAppVerId(self, appId, country):
-        appInfo = self.sess.get("https://apps.apple.com/app/id%s" % appId, headers={"X-Apple-Store-Front": STORE_TABLE[country.upper()]}).text
+        if not ',' in country:
+            storeFront = STORE_TABLE[country.upper()]
+        else:
+            storeFront = country
+        appInfo = self.sess.get("https://apps.apple.com/app/id%s" % appId, headers={"X-Apple-Store-Front": storeFront}).text
         appParam = re.findall(r'"buyParams":"(.*?)"', appInfo)[0]
         appParamDict = dict((c.split('=') for c in json.loads('"%s"' % appParam).split('&')))
         appVer = appParamDict['appExtVrsId']

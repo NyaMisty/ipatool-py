@@ -93,10 +93,15 @@ class StoreClient(object):
         guid = itunes_internal.pop('guid')
         kbsync = itunes_internal.pop('kbsync')
 
+        if not appVer:
+            from reqs.itunes import iTunesClient
+            iTunes = iTunesClient(self.sess)
+            appVer = iTunes.getAppVerId(appId, hdrs['X-Apple-Store-Front'])
+
         req = StoreBuyproductReq(
             guid=guid,
-            salableAdamId=appId,
-            appExtVrsId=appVer if appVer else None,
+            salableAdamId=str(appId),
+            appExtVrsId=str(appVer) if appVer else None,
             
             price='0',
             productType=productType,
