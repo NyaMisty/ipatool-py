@@ -270,8 +270,9 @@ class IPATool(object):
             with zipfile.ZipFile(filepath, 'a') as ipaFile:
                 logger.info("Writing out iTunesMetadata.plist...")
                 metadata = downInfo.metadata.as_dict()
-                metadata["apple-id"] = appleid
-                metadata["userName"] = appleid
+                if appleid:
+                    metadata["apple-id"] = appleid
+                    metadata["userName"] = appleid
                 ipaFile.writestr(zipfile.ZipInfo("iTunesMetadata.plist", get_zipinfo_datetime()), plistlib.dumps(metadata))
 
                 appContentDir = [c for c in ipaFile.namelist() if c.startswith('Payload/') and len(c.strip('/').split('/')) == 2][0]
