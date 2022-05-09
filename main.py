@@ -78,7 +78,9 @@ class IPATool(object):
         commparser = argparse.ArgumentParser(description='IPATool-Python Commands.', add_help=False)
         subp = commparser.add_subparsers(dest='command', required=True)
         lookup_p = subp.add_parser('lookup')
-        lookup_p.add_argument('--bundle-id', '-b', dest='bundle_id', required=True)
+        id_group = lookup_p.add_mutually_exclusive_group(required=True)
+        id_group.add_argument('--bundle-id', '-b', dest='bundle_id')
+        id_group.add_argument('--appId', '-i', dest='appId')
         lookup_p.add_argument('--country', '-c', dest='country', required=True)
         lookup_p.add_argument('--get-verid', dest='get_verid', action='store_true')
         lookup_p.set_defaults(func=self.handleLookup)
@@ -137,14 +139,18 @@ class IPATool(object):
         self.jsonOut = obj
 
     def handleLookup(self, args):
-        logger.info('Looking up app in country %s with ID %s' % (args.country, args.bundle_id))
+        if args.bundle_id:
+            s = 'BundleID %s' % args.bundle_id
+        else:
+            s = 'AppID %s' % args.appId
+        logger.info('Looking up app in country %s with BundleID %s' % (args.country, s))
         iTunes = iTunesClient(self.sess)
-        appInfos = iTunes.lookup(args.bundle_id, country=args.country)
+        appInfos = iTunes.lookup(bundleId=args.bundle_id, appId=args.appId, country=args.country)
         if appInfos.resultCount != 1:
-            logger.fatal("Failed to find app in country %s with ID %s" % (args.country, args.bundle_id))
+            logger.fatal("Failed to find app in country %s with %s" % (args.country, s))
             return
         appInfo = appInfos.results[0]
-        logger.info("Found app:\n\tName: %s\n\tVersion: %s\n\tappId: %s" % (appInfo.trackName, appInfo.version, appInfo.trackId))
+        logger.info("Found app:\n\tName: %s\n\tVersion: %s\n\tbundleId: %s\n\tappId: %s" % (appInfo.trackName, appInfo.version, appInfo.bundleId, appInfo.trackId))
         self.appId = appInfo.trackId
         # self.appInfo = appInfo
 
@@ -152,6 +158,7 @@ class IPATool(object):
             "name": appInfo.trackName,
             "version": appInfo.version,
             "appId": appInfo.trackId,
+            "bundleId": appInfo.bundleId,
         }
 
         if args.get_verid:

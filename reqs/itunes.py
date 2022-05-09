@@ -16,10 +16,11 @@ class iTunesClient(object):
     # curl -k -X GET \
     # -H "Content-Type: application/x-www-form-urlencoded" \
     # https://itunes.apple.com/lookup?bundleId=com.touchingapp.potatsolite&limit=1&media=software
-    def lookup(self, bundleId=None, term=None, country="US", limit=1, media="software") -> ItunesLookupResp:
+    def lookup(self, bundleId=None, appId=None, term=None, country="US", limit=1, media="software") -> ItunesLookupResp:
         r = self.sess.get("https://itunes.apple.com/lookup?",
                     params={
                         "bundleId": bundleId,
+                        "id": appId,
                         "term": term,
                         "country": country,
                         "limit": limit,
