@@ -214,6 +214,8 @@ class IPATool(object):
             
             if not downResp.songList:
                 logger.fatal("failed to get app download info!")
+                logger.fatal("  raw response: %s" % downResp.as_dict())
+                return
             downInfo = downResp.songList[0]
             logger.info('Got available version ids %s', downInfo.metadata.softwareVersionExternalIdentifiers)
             self._outputJson({
@@ -242,6 +244,8 @@ class IPATool(object):
             
             if not downResp.songList:
                 logger.fatal("failed to get app download info!")
+                logger.fatal("  raw response: %s" % downResp.as_dict())
+                return
             downInfo = downResp.songList[0]
 
             appName = downInfo.metadata.bundleDisplayName
