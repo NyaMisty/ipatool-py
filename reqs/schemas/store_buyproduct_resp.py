@@ -3298,6 +3298,63 @@ class StoreBuyproductResp:
             )
 
     class _subscriptionStatus:
+        class _family:
+
+            _types_map = {
+                "hasFamily": {"type": bool, "subtype": None},
+            }
+            _formats_map = {}
+            _validations_map = {
+                "hasFamily": {
+                    "required": True,
+                },
+            }
+
+            def __init__(self, hasFamily: bool = None):
+                pass
+                self.__hasFamily = hasFamily
+
+            def _get_hasFamily(self):
+                return self.__hasFamily
+
+            def _set_hasFamily(self, value):
+                if not isinstance(value, bool):
+                    raise TypeError("hasFamily must be bool")
+
+                self.__hasFamily = value
+
+            hasFamily = property(_get_hasFamily, _set_hasFamily)
+
+            @staticmethod
+            def from_dict(d):
+                v = {}
+                if "hasFamily" in d:
+                    v["hasFamily"] = (
+                        bool.from_dict(d["hasFamily"])
+                        if hasattr(bool, "from_dict")
+                        else d["hasFamily"]
+                    )
+                return StoreBuyproductResp._subscriptionStatus._family(**v)
+
+            def as_dict(self):
+                d = {}
+                if self.__hasFamily is not None:
+                    d["hasFamily"] = (
+                        self.__hasFamily.as_dict()
+                        if hasattr(self.__hasFamily, "as_dict")
+                        else self.__hasFamily
+                    )
+                return d
+
+            def __repr__(self):
+                return "<Class _family. hasFamily: {}>".format(
+                    limitedRepr(
+                        self.__hasFamily[:20]
+                        if isinstance(self.__hasFamily, bytes)
+                        else self.__hasFamily
+                    )
+                )
+
         class _music:
 
             _types_map = {
@@ -3460,63 +3517,6 @@ class StoreBuyproductResp:
                         if isinstance(self.__isNotEligibleForFreeTrial, bytes)
                         else self.__isNotEligibleForFreeTrial
                     ),
-                )
-
-        class _family:
-
-            _types_map = {
-                "hasFamily": {"type": bool, "subtype": None},
-            }
-            _formats_map = {}
-            _validations_map = {
-                "hasFamily": {
-                    "required": True,
-                },
-            }
-
-            def __init__(self, hasFamily: bool = None):
-                pass
-                self.__hasFamily = hasFamily
-
-            def _get_hasFamily(self):
-                return self.__hasFamily
-
-            def _set_hasFamily(self, value):
-                if not isinstance(value, bool):
-                    raise TypeError("hasFamily must be bool")
-
-                self.__hasFamily = value
-
-            hasFamily = property(_get_hasFamily, _set_hasFamily)
-
-            @staticmethod
-            def from_dict(d):
-                v = {}
-                if "hasFamily" in d:
-                    v["hasFamily"] = (
-                        bool.from_dict(d["hasFamily"])
-                        if hasattr(bool, "from_dict")
-                        else d["hasFamily"]
-                    )
-                return StoreBuyproductResp._subscriptionStatus._family(**v)
-
-            def as_dict(self):
-                d = {}
-                if self.__hasFamily is not None:
-                    d["hasFamily"] = (
-                        self.__hasFamily.as_dict()
-                        if hasattr(self.__hasFamily, "as_dict")
-                        else self.__hasFamily
-                    )
-                return d
-
-            def __repr__(self):
-                return "<Class _family. hasFamily: {}>".format(
-                    limitedRepr(
-                        self.__hasFamily[:20]
-                        if isinstance(self.__hasFamily, bytes)
-                        else self.__hasFamily
-                    )
                 )
 
         class _terms:
@@ -4105,20 +4105,27 @@ class StoreBuyproductResp:
             "commerceEvent_result_resultType": {"type": int, "subtype": None},
             "commerceEvent_flowType": {"type": int, "subtype": None},
             "commerceEvent_flowStep": {"type": int, "subtype": None},
+            "dialogId": {"type": str, "subtype": None},
+            "message": {"type": str, "subtype": None},
+            "messageCode": {"type": str, "subtype": None},
+            "options": {"type": list, "subtype": str},
+            "actionUrl": {"type": str, "subtype": None},
+            "asnState": {"type": int, "subtype": None},
+            "eventType": {"type": str, "subtype": None},
         }
         _formats_map = {}
         _validations_map = {
             "itemIds": {
-                "required": True,
+                "required": False,
             },
             "price": {
-                "required": True,
+                "required": False,
             },
             "priceType": {
-                "required": True,
+                "required": False,
             },
             "productTypes": {
-                "required": True,
+                "required": False,
             },
             "mtApp": {
                 "required": True,
@@ -4145,25 +4152,46 @@ class StoreBuyproductResp:
                 "required": True,
             },
             "currency": {
-                "required": True,
+                "required": False,
             },
             "exchangeRateToUSD": {
-                "required": True,
+                "required": False,
             },
             "commerceEvent_purchase_priceType": {
-                "required": True,
+                "required": False,
             },
             "commerceEvent_storeFrontId": {
-                "required": True,
+                "required": False,
             },
             "commerceEvent_result_resultType": {
-                "required": True,
+                "required": False,
             },
             "commerceEvent_flowType": {
-                "required": True,
+                "required": False,
             },
             "commerceEvent_flowStep": {
-                "required": True,
+                "required": False,
+            },
+            "dialogId": {
+                "required": False,
+            },
+            "message": {
+                "required": False,
+            },
+            "messageCode": {
+                "required": False,
+            },
+            "options": {
+                "required": False,
+            },
+            "actionUrl": {
+                "required": False,
+            },
+            "asnState": {
+                "required": False,
+            },
+            "eventType": {
+                "required": False,
             },
         }
 
@@ -4188,6 +4216,13 @@ class StoreBuyproductResp:
             commerceEvent_result_resultType: int = None,
             commerceEvent_flowType: int = None,
             commerceEvent_flowStep: int = None,
+            dialogId: str = None,
+            message: str = None,
+            messageCode: str = None,
+            options: List[str] = None,
+            actionUrl: str = None,
+            asnState: int = None,
+            eventType: str = None,
         ):
             pass
             self.__itemIds = itemIds
@@ -4209,14 +4244,21 @@ class StoreBuyproductResp:
             self.__commerceEvent_result_resultType = commerceEvent_result_resultType
             self.__commerceEvent_flowType = commerceEvent_flowType
             self.__commerceEvent_flowStep = commerceEvent_flowStep
+            self.__dialogId = dialogId
+            self.__message = message
+            self.__messageCode = messageCode
+            self.__options = options
+            self.__actionUrl = actionUrl
+            self.__asnState = asnState
+            self.__eventType = eventType
 
         def _get_itemIds(self):
             return self.__itemIds
 
         def _set_itemIds(self, value):
-            if not isinstance(value, list):
+            if value is not None and not isinstance(value, list):
                 raise TypeError("itemIds must be list")
-            if not all(isinstance(i, int) for i in value):
+            if value is not None and not all(isinstance(i, int) for i in value):
                 raise TypeError("itemIds list values must be int")
 
             self.__itemIds = value
@@ -4227,7 +4269,7 @@ class StoreBuyproductResp:
             return self.__price
 
         def _set_price(self, value):
-            if not isinstance(value, int):
+            if value is not None and not isinstance(value, int):
                 raise TypeError("price must be int")
 
             self.__price = value
@@ -4238,7 +4280,7 @@ class StoreBuyproductResp:
             return self.__priceType
 
         def _set_priceType(self, value):
-            if not isinstance(value, str):
+            if value is not None and not isinstance(value, str):
                 raise TypeError("priceType must be str")
 
             self.__priceType = value
@@ -4249,9 +4291,9 @@ class StoreBuyproductResp:
             return self.__productTypes
 
         def _set_productTypes(self, value):
-            if not isinstance(value, list):
+            if value is not None and not isinstance(value, list):
                 raise TypeError("productTypes must be list")
-            if not all(isinstance(i, str) for i in value):
+            if value is not None and not all(isinstance(i, str) for i in value):
                 raise TypeError("productTypes list values must be str")
 
             self.__productTypes = value
@@ -4350,7 +4392,7 @@ class StoreBuyproductResp:
             return self.__currency
 
         def _set_currency(self, value):
-            if not isinstance(value, str):
+            if value is not None and not isinstance(value, str):
                 raise TypeError("currency must be str")
 
             self.__currency = value
@@ -4361,7 +4403,7 @@ class StoreBuyproductResp:
             return self.__exchangeRateToUSD
 
         def _set_exchangeRateToUSD(self, value):
-            if not isinstance(value, float):
+            if value is not None and not isinstance(value, float):
                 raise TypeError("exchangeRateToUSD must be float")
 
             self.__exchangeRateToUSD = value
@@ -4372,7 +4414,7 @@ class StoreBuyproductResp:
             return self.__commerceEvent_purchase_priceType
 
         def _set_commerceEvent_purchase_priceType(self, value):
-            if not isinstance(value, str):
+            if value is not None and not isinstance(value, str):
                 raise TypeError("commerceEvent_purchase_priceType must be str")
 
             self.__commerceEvent_purchase_priceType = value
@@ -4385,7 +4427,7 @@ class StoreBuyproductResp:
             return self.__commerceEvent_storeFrontId
 
         def _set_commerceEvent_storeFrontId(self, value):
-            if not isinstance(value, str):
+            if value is not None and not isinstance(value, str):
                 raise TypeError("commerceEvent_storeFrontId must be str")
 
             self.__commerceEvent_storeFrontId = value
@@ -4398,7 +4440,7 @@ class StoreBuyproductResp:
             return self.__commerceEvent_result_resultType
 
         def _set_commerceEvent_result_resultType(self, value):
-            if not isinstance(value, int):
+            if value is not None and not isinstance(value, int):
                 raise TypeError("commerceEvent_result_resultType must be int")
 
             self.__commerceEvent_result_resultType = value
@@ -4411,7 +4453,7 @@ class StoreBuyproductResp:
             return self.__commerceEvent_flowType
 
         def _set_commerceEvent_flowType(self, value):
-            if not isinstance(value, int):
+            if value is not None and not isinstance(value, int):
                 raise TypeError("commerceEvent_flowType must be int")
 
             self.__commerceEvent_flowType = value
@@ -4424,7 +4466,7 @@ class StoreBuyproductResp:
             return self.__commerceEvent_flowStep
 
         def _set_commerceEvent_flowStep(self, value):
-            if not isinstance(value, int):
+            if value is not None and not isinstance(value, int):
                 raise TypeError("commerceEvent_flowStep must be int")
 
             self.__commerceEvent_flowStep = value
@@ -4432,6 +4474,85 @@ class StoreBuyproductResp:
         commerceEvent_flowStep = property(
             _get_commerceEvent_flowStep, _set_commerceEvent_flowStep
         )
+
+        def _get_dialogId(self):
+            return self.__dialogId
+
+        def _set_dialogId(self, value):
+            if value is not None and not isinstance(value, str):
+                raise TypeError("dialogId must be str")
+
+            self.__dialogId = value
+
+        dialogId = property(_get_dialogId, _set_dialogId)
+
+        def _get_message(self):
+            return self.__message
+
+        def _set_message(self, value):
+            if value is not None and not isinstance(value, str):
+                raise TypeError("message must be str")
+
+            self.__message = value
+
+        message = property(_get_message, _set_message)
+
+        def _get_messageCode(self):
+            return self.__messageCode
+
+        def _set_messageCode(self, value):
+            if value is not None and not isinstance(value, str):
+                raise TypeError("messageCode must be str")
+
+            self.__messageCode = value
+
+        messageCode = property(_get_messageCode, _set_messageCode)
+
+        def _get_options(self):
+            return self.__options
+
+        def _set_options(self, value):
+            if value is not None and not isinstance(value, list):
+                raise TypeError("options must be list")
+            if value is not None and not all(isinstance(i, str) for i in value):
+                raise TypeError("options list values must be str")
+
+            self.__options = value
+
+        options = property(_get_options, _set_options)
+
+        def _get_actionUrl(self):
+            return self.__actionUrl
+
+        def _set_actionUrl(self, value):
+            if value is not None and not isinstance(value, str):
+                raise TypeError("actionUrl must be str")
+
+            self.__actionUrl = value
+
+        actionUrl = property(_get_actionUrl, _set_actionUrl)
+
+        def _get_asnState(self):
+            return self.__asnState
+
+        def _set_asnState(self, value):
+            if value is not None and not isinstance(value, int):
+                raise TypeError("asnState must be int")
+
+            self.__asnState = value
+
+        asnState = property(_get_asnState, _set_asnState)
+
+        def _get_eventType(self):
+            return self.__eventType
+
+        def _set_eventType(self, value):
+            if value is not None and not isinstance(value, str):
+                raise TypeError("eventType must be str")
+
+            self.__eventType = value
+
+        eventType = property(_get_eventType, _set_eventType)
 
         @staticmethod
         def from_dict(d):
@@ -4548,6 +4669,47 @@ class StoreBuyproductResp:
                     if hasattr(int, "from_dict")
                     else d["commerceEvent_flowStep"]
                 )
+            if "dialogId" in d:
+                v["dialogId"] = (
+                    str.from_dict(d["dialogId"])
+                    if hasattr(str, "from_dict")
+                    else d["dialogId"]
+                )
+            if "message" in d:
+                v["message"] = (
+                    str.from_dict(d["message"])
+                    if hasattr(str, "from_dict")
+                    else d["message"]
+                )
+            if "messageCode" in d:
+                v["messageCode"] = (
+                    str.from_dict(d["messageCode"])
+                    if hasattr(str, "from_dict")
+                    else d["messageCode"]
+                )
+            if "options" in d:
+                v["options"] = [
+                    str.from_dict(p) if hasattr(str, "from_dict") else p
+                    for p in d["options"]
+                ]
+            if "actionUrl" in d:
+                v["actionUrl"] = (
+                    str.from_dict(d["actionUrl"])
+                    if hasattr(str, "from_dict")
+                    else d["actionUrl"]
+                )
+            if "asnState" in d:
+                v["asnState"] = (
+                    int.from_dict(d["asnState"])
+                    if hasattr(int, "from_dict")
+                    else d["asnState"]
+                )
+            if "eventType" in d:
+                v["eventType"] = (
+                    str.from_dict(d["eventType"])
+                    if hasattr(str, "from_dict")
+                    else d["eventType"]
+                )
             return StoreBuyproductResp._metrics(**v)
 
         def as_dict(self):
@@ -4663,10 +4825,50 @@ class StoreBuyproductResp:
                     if hasattr(self.__commerceEvent_flowStep, "as_dict")
                     else self.__commerceEvent_flowStep
                 )
+            if self.__dialogId is not None:
+                d["dialogId"] = (
+                    self.__dialogId.as_dict()
+                    if hasattr(self.__dialogId, "as_dict")
+                    else self.__dialogId
+                )
+            if self.__message is not None:
+                d["message"] = (
+                    self.__message.as_dict()
+                    if hasattr(self.__message, "as_dict")
+                    else self.__message
+                )
+            if self.__messageCode is not None:
+                d["messageCode"] = (
+                    self.__messageCode.as_dict()
+                    if hasattr(self.__messageCode, "as_dict")
+                    else self.__messageCode
+                )
+            if self.__options is not None:
+                d["options"] = [
+                    p.as_dict() if hasattr(p, "as_dict") else p for p in self.__options
+                ]
+            if self.__actionUrl is not None:
+                d["actionUrl"] = (
+                    self.__actionUrl.as_dict()
+                    if hasattr(self.__actionUrl, "as_dict")
+                    else self.__actionUrl
+                )
+            if self.__asnState is not None:
+                d["asnState"] = (
+                    self.__asnState.as_dict()
+                    if hasattr(self.__asnState, "as_dict")
+                    else self.__asnState
+                )
+            if self.__eventType is not None:
+                d["eventType"] = (
+                    self.__eventType.as_dict()
+                    if hasattr(self.__eventType, "as_dict")
+                    else self.__eventType
+                )
             return d
 
         def __repr__(self):
-            return "<Class _metrics. itemIds: {}, price: {}, priceType: {}, productTypes: {}, mtApp: {}, mtClientId: {}, mtEventTime: {}, mtPageId: {}, mtPageType: {}, mtPrevPage: {}, mtRequestId: {}, mtTopic: {}, currency: {}, exchangeRateToUSD: {}, commerceEvent_purchase_priceType: {}, commerceEvent_storeFrontId: {}, commerceEvent_result_resultType: {}, commerceEvent_flowType: {}, commerceEvent_flowStep: {}>".format(
+            return "<Class _metrics. itemIds: {}, price: {}, priceType: {}, productTypes: {}, mtApp: {}, mtClientId: {}, mtEventTime: {}, mtPageId: {}, mtPageType: {}, mtPrevPage: {}, mtRequestId: {}, mtTopic: {}, currency: {}, exchangeRateToUSD: {}, commerceEvent_purchase_priceType: {}, commerceEvent_storeFrontId: {}, commerceEvent_result_resultType: {}, commerceEvent_flowType: {}, commerceEvent_flowStep: {}, dialogId: {}, message: {}, messageCode: {}, options: {}, actionUrl: {}, asnState: {}, eventType: {}>".format(
                 limitedRepr(
                     self.__itemIds[:20]
                     if isinstance(self.__itemIds, bytes)
@@ -4761,6 +4963,41 @@ class StoreBuyproductResp:
                     self.__commerceEvent_flowStep[:20]
                     if isinstance(self.__commerceEvent_flowStep, bytes)
                     else self.__commerceEvent_flowStep
+                ),
+                limitedRepr(
+                    self.__dialogId[:20]
+                    if isinstance(self.__dialogId, bytes)
+                    else self.__dialogId
+                ),
+                limitedRepr(
+                    self.__message[:20]
+                    if isinstance(self.__message, bytes)
+                    else self.__message
+                ),
+                limitedRepr(
+                    self.__messageCode[:20]
+                    if isinstance(self.__messageCode, bytes)
+                    else self.__messageCode
+                ),
+                limitedRepr(
+                    self.__options[:20]
+                    if isinstance(self.__options, bytes)
+                    else self.__options
+                ),
+                limitedRepr(
+                    self.__actionUrl[:20]
+                    if isinstance(self.__actionUrl, bytes)
+                    else self.__actionUrl
+                ),
+                limitedRepr(
+                    self.__asnState[:20]
+                    if isinstance(self.__asnState, bytes)
+                    else self.__asnState
+                ),
+                limitedRepr(
+                    self.__eventType[:20]
+                    if isinstance(self.__eventType, bytes)
+                    else self.__eventType
                 ),
             )
 

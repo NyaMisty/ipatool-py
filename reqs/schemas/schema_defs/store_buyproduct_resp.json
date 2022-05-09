@@ -472,13 +472,34 @@
         },
         "commerceEvent_flowStep": {
           "type": "integer"
+        },
+
+        "dialogId": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "messageCode": {
+          "type": "string"
+        },
+        "options": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "actionUrl": {
+          "type": "string"
+        },
+        "asnState": {
+          "type": "integer"
+        },
+        "eventType": {
+          "type": "string"
         }
       },
       "required": [
-        "itemIds",
-        "price",
-        "priceType",
-        "productTypes",
         "mtApp",
         "mtClientId",
         "mtEventTime",
@@ -486,14 +507,28 @@
         "mtPageType",
         "mtPrevPage",
         "mtRequestId",
-        "mtTopic",
+        "mtTopic"
+      ],
+      "optional": [
+        "itemIds",
+        "price",
+        "priceType",
+        "productTypes",
         "currency",
         "exchangeRateToUSD",
         "commerceEvent_purchase_priceType",
         "commerceEvent_storeFrontId",
         "commerceEvent_result_resultType",
         "commerceEvent_flowType",
-        "commerceEvent_flowStep"
+        "commerceEvent_flowStep",
+
+        "dialogId",
+        "message",
+        "messageCode",
+        "options",
+        "actionUrl",
+        "asnState",
+        "eventType"
       ]
     },
     "duAnonymousPings": {
