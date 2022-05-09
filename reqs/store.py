@@ -85,7 +85,8 @@ class StoreClient(object):
             raise StoreException("download", resp.customerMessage, resp.failureType)
         return resp
 
-    def buyProduct(self, appId, appVer='', productType='C', pricingParameters='STDRDL'):
+    def buyProduct(self, appId, appVer='', productType='C', pricingParameters='STDQ'):
+        # STDQ - buy, STDRDL - redownload, SWUPD - update
         url = "https://p25-buy.itunes.apple.com/WebObjects/MZBuy.woa/wa/buyProduct"
         
         itunes_internal = self.iTunes_provider(url)
@@ -107,9 +108,9 @@ class StoreClient(object):
             productType=productType,
             pricingParameters=pricingParameters,
             
-            ageCheck='true',
-            hasBeenAuthedForBuy='true',
-            isInApp='false',
+            # ageCheck='true',
+            # hasBeenAuthedForBuy='true',
+            # isInApp='false',
         )
         payload = req.as_dict()
         # kbsync is bytes, but json schema does not support it, so we have to assign it
