@@ -196,6 +196,11 @@ class IPATool(object):
             logger.info('Logged in as %s' % Store.accountName)
         return Store
 
+    def _handleStoreException(self, _e):
+        e = _e # type: StoreException
+        logger.fatal("Store %s failed! Message: %s%s" % (e.req, e.errMsg, " (errorType %s)" % e.errType if e.errType else ''))
+        logger.fatal("    Raw Response: %s" % (e.resp.as_dict()))
+
     def handleHistoryVersion(self, args):
         if args.appId:
             self.appId = args.appId
@@ -214,15 +219,14 @@ class IPATool(object):
             
             if not downResp.songList:
                 logger.fatal("failed to get app download info!")
-                logger.fatal("  raw response: %s" % downResp.as_dict())
-                return
+                raise StoreException('download', downResp, 'no songList')
             downInfo = downResp.songList[0]
             logger.info('Got available version ids %s', downInfo.metadata.softwareVersionExternalIdentifiers)
             self._outputJson({
                 "appVerIds": downInfo.metadata.softwareVersionExternalIdentifiers
             })
         except StoreException as e:
-            logger.fatal("Store %s failed! Message: %s%s" % (e.req, e.errMsg, " (errorType %s)" % e.errType if e.errType else ''))
+            self._handleStoreException(e)
 
     def handleDownload(self, args):
         if args.appId:
@@ -244,8 +248,7 @@ class IPATool(object):
             
             if not downResp.songList:
                 logger.fatal("failed to get app download info!")
-                logger.fatal("  raw response: %s" % downResp.as_dict())
-                return
+                raise StoreException('download', downResp, 'no songList')
             downInfo = downResp.songList[0]
 
             appName = downInfo.metadata.bundleDisplayName
@@ -296,7 +299,7 @@ class IPATool(object):
                 "downloadedVerId": appVerId,
             })
         except StoreException as e:
-            logger.fatal("Store %s failed! Message: %s%s" % (e.req, e.errMsg, " (errorType %s)" % e.errType if e.errType else ''))
+            self._handleStoreException(e)
 
 def main():
     tool = IPATool()

@@ -8,8 +8,9 @@ from reqs.schemas.store_download_req import StoreDownloadReq
 from reqs.schemas.store_download_resp import StoreDownloadResp
 
 class StoreException(Exception):
-    def __init__(self, req, errMsg, errType=None):
+    def __init__(self, req, resp, errMsg, errType=None):
         self.req = req
+        self.resp = resp # type: StoreDownloadResp
         self.errMsg = errMsg
         self.errType = errType
         super().__init__(
@@ -82,7 +83,7 @@ class StoreClient(object):
 
         resp = StoreDownloadResp.from_dict(plistlib.loads(r.content))
         if resp.cancel_purchase_batch:
-            raise StoreException("download", resp.customerMessage, resp.failureType)
+            raise StoreException("volumeStoreDownloadProduct", resp, resp.customerMessage, resp.failureType + '-' + resp.metrics.dialogId)
         return resp
 
     def buyProduct(self, appId, appVer='', productType='C', pricingParameters='STDQ'):
@@ -125,6 +126,8 @@ class StoreClient(object):
                         )
         
         resp = StoreBuyproductResp.from_dict(plistlib.loads(r.content))
+        if resp.cancel_purchase_batch:
+            raise StoreException("buyProduct", resp, resp.customerMessage, resp.failureType + '-' + resp.metrics.dialogId)
         return resp
 
     def download(self, appId, appVer=''):
