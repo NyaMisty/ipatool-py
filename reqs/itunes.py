@@ -36,8 +36,12 @@ class iTunesClient(object):
             storeFront = STORE_TABLE[country.upper()]
         else:
             storeFront = country
-        appInfo = self.sess.get("https://apps.apple.com/app/id%s" % appId, headers={"X-Apple-Store-Front": storeFront}).text
-        appParam = re.findall(r'"buyParams":"(.*?)"', appInfo)[0]
+        appInfo = requests.get("https://apps.apple.com/app/id%s" % appId, headers={"X-Apple-Store-Front": storeFront}).text
+        try:
+            appParam = re.findall(r'"buyParams":"(.*?)"', appInfo)[0]
+        except:
+            appParam = re.findall(r'buy-params="(.*?)"', appInfo)[0]
+            appParam = appParam.replace('&amp;', '&')
         appParamDict = dict((c.split('=') for c in json.loads('"%s"' % appParam).split('&')))
         appVer = appParamDict['appExtVrsId']
         return appVer
