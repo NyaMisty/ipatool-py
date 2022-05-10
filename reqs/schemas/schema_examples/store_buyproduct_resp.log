@@ -57,6 +57,75 @@
 <key>jingleAction</key><string>purchaseProduct</string>
 <key>status</key><integer>0</integer>
 
+<key>dsPersonId</key><string>10964418715</string>
+<key>creditDisplay</key><string></string>
+<key>creditBalance</key><string>1311811</string>
+<key>freeSongBalance</key><string>1311811</string>
+
+<key>authorized</key><false/><key>download-queue-item-count</key><integer>0</integer>
+<key>songList</key>
+<array>
+</array>
+<key>metrics</key>
+<dict>
+
+  <key>itemIds</key>
+  <array>
+    <integer>580311103</integer>
+  </array>
+  <key>price</key><real>0.00</real>
+  <key>priceType</key><string>STDQ</string>
+  <key>productTypes</key>
+  <array>
+    <string>C</string>
+  </array>
+  <key>currency</key><string>JPY</string>
+  <key>exchangeRateToUSD</key><real>0.0076722418</real>
+  <key>commerceEvent_purchase_priceType</key><string>STDQ</string>
+  <key>commerceEvent_storeFrontId</key><string>143462</string>
+  <key>commerceEvent_result_resultType</key><integer>0</integer>
+  <key>commerceEvent_flowType</key><integer>4</integer>
+  <key>commerceEvent_flowStep</key><integer>6</integer>
+</dict>
+
+  <key>duAnonymousPings</key>
+  <array>
+    <string>https://xp.apple.com/report/2/xp_app_buy?clientId=0&amp;sf=143462&amp;adamId=580311103</string>
+  </array>
+<key>subscriptionStatus</key>
+<dict>
+<key>terms</key>
+<array>
+<dict>
+<key>type</key><string>Store</string>
+<key>latestTerms</key><integer>28</integer>
+<key>agreedToTerms</key><integer>31</integer>
+<key>source</key><string>account</string>
+</dict>
+</array>
+<key>account</key>
+<dict>
+<key>isMinor</key><false/>
+<key>suspectUnderage</key><false/>
+</dict>
+<key>family</key>
+<dict>
+<key>hasFamily</key><false/>
+</dict>
+</dict>
+</dict>
+</plist>
+
+
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<plist version="1.0">
+<dict>
+<key>pings</key>
+<array></array>
+<key>jingleDocType</key><string>purchaseSuccess</string>
+<key>jingleAction</key><string>purchaseProduct</string>
+<key>status</key><integer>0</integer>
+
 <key>dsPersonId</key><string>16916646015</string>
 <key>creditDisplay</key><string></string>
 <key>creditBalance</key><string>1311811</string>

@@ -106,6 +106,7 @@ class IPATool(object):
         add_auth_options(down_p)
         down_p.add_argument('--appId', '-i', dest='appId')
         down_p.add_argument('--appVerId', dest='appVerId')
+        down_p.add_argument('--purchase', action='store_true')
 
         down_p.add_argument('--output-dir', '-o', dest='output_dir', default='.')
         down_p.set_defaults(func=self.handleDownload)
@@ -195,11 +196,7 @@ class IPATool(object):
 
             logger.info("Logging into iTunes...")
 
-            if appleid.lower() == 'itunes':
-                logger.info("Using iTunes interface to download app!")
-                Store.authenticate(appleid, applepass)
-            else:
-                Store.authenticate(appleid, applepass)
+            Store.authenticate(appleid, applepass)
             logger.info('Logged in as %s' % Store.accountName)
         return Store
 
@@ -248,6 +245,16 @@ class IPATool(object):
         try:
             appleid = args.appleid
             Store = self._get_StoreClient(args)
+
+            if args.purchase:
+                logger.info('Try to purchasing appId %s' % (self.appId))
+                try:
+                    Store.purchase(self.appId)
+                except StoreException as e:
+                    if e.errMsg == 'purchased_before':
+                        logger.warning('You have already purchased appId %s before' % (self.appId))
+                    else:
+                        raise
             
             logger.info('Retriving download info for appId %s%s' % (self.appId, " with versionId %s" % self.appVerId if self.appVerId else ""))
 
@@ -294,6 +301,8 @@ class IPATool(object):
                 sinfs = {c.id: c.sinf for c in downInfo.sinfs}
                 for i, sinfPath in enumerate(scManifest['SinfPaths']):
                     ipaFile.writestr(appContentDir + '/' + sinfPath, sinfs[i])
+
+            logger.info("Downloaded ipa to %s" % filename)
 
             self._outputJson({
                 "appName": appName,

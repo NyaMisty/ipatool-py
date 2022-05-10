@@ -22,8 +22,6 @@ class StoreClient(object):
     def __init__(self, sess: requests.Session, guid: str = '000C2941396B'):
         self.sess = sess
         self.guid = guid
-        self.dsid = None
-        self.storeFront = None
         self.accountName = None
         self.iTunes_provider = None
 
@@ -44,8 +42,11 @@ class StoreClient(object):
         resp = StoreAuthenticateResp.from_dict(plistlib.loads(r.content))
         if not resp.m_allowed:
             raise StoreException("authenticate", resp.customerMessage, resp.failureType)
-        self.dsid = str(resp.download_queue_info.dsid)
-        self.storeFront = r.headers.get('x-set-apple-store-front')
+
+        self.sess.headers['X-Dsid'] = self.sess.headers['iCloud-Dsid'] = str(resp.download_queue_info.dsid)
+        self.sess.headers['X-Apple-Store-Front'] = r.headers.get('x-set-apple-store-front')
+        self.sess.headers['X-Token'] = resp.passwordToken
+
         self.accountName = resp.accountInfo.address.firstName + " " + resp.accountInfo.address.lastName
         return resp
 
@@ -75,10 +76,8 @@ class StoreClient(object):
                                "guid": self.guid
                            },
                            headers={
-                               "iCloud-DSID": self.dsid,
                                "Content-Type": "application/x-www-form-urlencoded",
                                "User-Agent": "Configurator/2.0 (Macintosh; OS X 10.12.6; 16G29) AppleWebKit/2603.3.8",
-                               "X-Dsid": self.dsid,
                            }, data=plistlib.dumps(req.as_dict()))
 
         resp = StoreDownloadResp.from_dict(plistlib.loads(r.content))
@@ -124,11 +123,50 @@ class StoreClient(object):
                         headers=hdrs, 
                         data=plistlib.dumps(payload)
                         )
-        
+
         resp = StoreBuyproductResp.from_dict(plistlib.loads(r.content))
         if resp.cancel_purchase_batch:
             raise StoreException("buyProduct", resp, resp.customerMessage, resp.failureType + '-' + resp.metrics.dialogId)
         return resp
+
+    def buyProduct_purchase(self, appId, productType='C'):
+        url = "https://buy.itunes.apple.com/WebObjects/MZBuy.woa/wa/buyProduct"
+        req = StoreBuyproductReq(
+            guid=self.guid,
+            salableAdamId=str(appId),
+            appExtVrsId='0',
+
+            price='0',
+            productType=productType,
+            pricingParameters='STDQ',
+
+            hasAskedToFulfillPreorder='true',
+            buyWithoutAuthorization='true',
+            hasDoneAgeCheck='true',
+        )
+        payload = req.as_dict()
+
+        r = self.sess.post(url,
+                           headers={
+                               "Content-Type": "application/x-apple-plist",
+                               "User-Agent": "Configurator/2.15 (Macintosh; OS X 11.0.0; 16G29) AppleWebKit/2603.3.8",
+                           },
+                           data=plistlib.dumps(payload))
+
+        if r.status_code == 500:
+            raise StoreException("buyProduct_purchase", None, 'purchased_before')
+
+        resp = StoreBuyproductResp.from_dict(plistlib.loads(r.content))
+        if resp.status != 0 or resp.jingleDocType != 'purchaseSuccess':
+            raise StoreException("buyProduct_purchase", resp, resp.customerMessage,
+                                 resp.status + '-' + resp.jingleDocType)
+        return resp
+
+    def purchase(self, appId):
+        if self.iTunes_provider:
+            return None # iTunes mode will automatically purchase the app if not purchased
+        else:
+            return self.buyProduct_purchase(appId)
 
     def download(self, appId, appVer=''):
         if self.iTunes_provider:

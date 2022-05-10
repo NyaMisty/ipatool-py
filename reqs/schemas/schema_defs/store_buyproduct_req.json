@@ -65,7 +65,18 @@
     },
     "salableAdamId": {
       "type": "string"
+    },
+
+    "hasAskedToFulfillPreorder": {
+      "type": "string"
+    },
+    "buyWithoutAuthorization": {
+      "type": "string"
+    },
+    "hasDoneAgeCheck": {
+      "type": "string"
     }
+    
   },
   "required": [
     "guid",

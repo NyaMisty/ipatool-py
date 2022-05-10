@@ -25,6 +25,9 @@ class StoreBuyproductReq:
         "pricingParameters": {"type": str, "subtype": None},
         "productType": {"type": str, "subtype": None},
         "salableAdamId": {"type": str, "subtype": None},
+        "hasAskedToFulfillPreorder": {"type": str, "subtype": None},
+        "buyWithoutAuthorization": {"type": str, "subtype": None},
+        "hasDoneAgeCheck": {"type": str, "subtype": None},
     }
     _formats_map = {}
     _validations_map = {
@@ -91,6 +94,15 @@ class StoreBuyproductReq:
         "salableAdamId": {
             "required": True,
         },
+        "hasAskedToFulfillPreorder": {
+            "required": False,
+        },
+        "buyWithoutAuthorization": {
+            "required": False,
+        },
+        "hasDoneAgeCheck": {
+            "required": False,
+        },
     }
 
     def __init__(
@@ -116,6 +128,9 @@ class StoreBuyproductReq:
         pricingParameters: str = None,
         productType: str = None,
         salableAdamId: str = None,
+        hasAskedToFulfillPreorder: str = None,
+        buyWithoutAuthorization: str = None,
+        hasDoneAgeCheck: str = None,
     ):
         pass
         self.__ageCheck = ageCheck
@@ -139,6 +154,9 @@ class StoreBuyproductReq:
         self.__pricingParameters = pricingParameters
         self.__productType = productType
         self.__salableAdamId = salableAdamId
+        self.__hasAskedToFulfillPreorder = hasAskedToFulfillPreorder
+        self.__buyWithoutAuthorization = buyWithoutAuthorization
+        self.__hasDoneAgeCheck = hasDoneAgeCheck
 
     def _get_ageCheck(self):
         return self.__ageCheck
@@ -371,6 +389,43 @@ class StoreBuyproductReq:
 
     salableAdamId = property(_get_salableAdamId, _set_salableAdamId)
 
+    def _get_hasAskedToFulfillPreorder(self):
+        return self.__hasAskedToFulfillPreorder
+
+    def _set_hasAskedToFulfillPreorder(self, value):
+        if value is not None and not isinstance(value, str):
+            raise TypeError("hasAskedToFulfillPreorder must be str")
+
+        self.__hasAskedToFulfillPreorder = value
+
+    hasAskedToFulfillPreorder = property(
+        _get_hasAskedToFulfillPreorder, _set_hasAskedToFulfillPreorder
+    )
+
+    def _get_buyWithoutAuthorization(self):
+        return self.__buyWithoutAuthorization
+
+    def _set_buyWithoutAuthorization(self, value):
+        if value is not None and not isinstance(value, str):
+            raise TypeError("buyWithoutAuthorization must be str")
+
+        self.__buyWithoutAuthorization = value
+
+    buyWithoutAuthorization = property(
+        _get_buyWithoutAuthorization, _set_buyWithoutAuthorization
+    )
+
+    def _get_hasDoneAgeCheck(self):
+        return self.__hasDoneAgeCheck
+
+    def _set_hasDoneAgeCheck(self, value):
+        if value is not None and not isinstance(value, str):
+            raise TypeError("hasDoneAgeCheck must be str")
+
+        self.__hasDoneAgeCheck = value
+
+    hasDoneAgeCheck = property(_get_hasDoneAgeCheck, _set_hasDoneAgeCheck)
+
     @staticmethod
     def from_dict(d):
         v = {}
@@ -487,6 +542,24 @@ class StoreBuyproductReq:
                 str.from_dict(d["salableAdamId"])
                 if hasattr(str, "from_dict")
                 else d["salableAdamId"]
+            )
+        if "hasAskedToFulfillPreorder" in d:
+            v["hasAskedToFulfillPreorder"] = (
+                str.from_dict(d["hasAskedToFulfillPreorder"])
+                if hasattr(str, "from_dict")
+                else d["hasAskedToFulfillPreorder"]
+            )
+        if "buyWithoutAuthorization" in d:
+            v["buyWithoutAuthorization"] = (
+                str.from_dict(d["buyWithoutAuthorization"])
+                if hasattr(str, "from_dict")
+                else d["buyWithoutAuthorization"]
+            )
+        if "hasDoneAgeCheck" in d:
+            v["hasDoneAgeCheck"] = (
+                str.from_dict(d["hasDoneAgeCheck"])
+                if hasattr(str, "from_dict")
+                else d["hasDoneAgeCheck"]
             )
         return StoreBuyproductReq(**v)
 
@@ -616,10 +689,28 @@ class StoreBuyproductReq:
                 if hasattr(self.__salableAdamId, "as_dict")
                 else self.__salableAdamId
             )
+        if self.__hasAskedToFulfillPreorder is not None:
+            d["hasAskedToFulfillPreorder"] = (
+                self.__hasAskedToFulfillPreorder.as_dict()
+                if hasattr(self.__hasAskedToFulfillPreorder, "as_dict")
+                else self.__hasAskedToFulfillPreorder
+            )
+        if self.__buyWithoutAuthorization is not None:
+            d["buyWithoutAuthorization"] = (
+                self.__buyWithoutAuthorization.as_dict()
+                if hasattr(self.__buyWithoutAuthorization, "as_dict")
+                else self.__buyWithoutAuthorization
+            )
+        if self.__hasDoneAgeCheck is not None:
+            d["hasDoneAgeCheck"] = (
+                self.__hasDoneAgeCheck.as_dict()
+                if hasattr(self.__hasDoneAgeCheck, "as_dict")
+                else self.__hasDoneAgeCheck
+            )
         return d
 
     def __repr__(self):
-        return "<Class StoreBuyproductReq. ageCheck: {}, appExtVrsId: {}, guid: {}, hasBeenAuthedForBuy: {}, isInApp: {}, kbsync: {}, machineName: {}, mtApp: {}, mtClientId: {}, mtEventTime: {}, mtPageId: {}, mtPageType: {}, mtPrevPage: {}, mtRequestId: {}, mtTopic: {}, needDiv: {}, pg: {}, price: {}, pricingParameters: {}, productType: {}, salableAdamId: {}>".format(
+        return "<Class StoreBuyproductReq. ageCheck: {}, appExtVrsId: {}, guid: {}, hasBeenAuthedForBuy: {}, isInApp: {}, kbsync: {}, machineName: {}, mtApp: {}, mtClientId: {}, mtEventTime: {}, mtPageId: {}, mtPageType: {}, mtPrevPage: {}, mtRequestId: {}, mtTopic: {}, needDiv: {}, pg: {}, price: {}, pricingParameters: {}, productType: {}, salableAdamId: {}, hasAskedToFulfillPreorder: {}, buyWithoutAuthorization: {}, hasDoneAgeCheck: {}>".format(
             limitedRepr(
                 self.__ageCheck[:20]
                 if isinstance(self.__ageCheck, bytes)
@@ -714,5 +805,20 @@ class StoreBuyproductReq:
                 self.__salableAdamId[:20]
                 if isinstance(self.__salableAdamId, bytes)
                 else self.__salableAdamId
+            ),
+            limitedRepr(
+                self.__hasAskedToFulfillPreorder[:20]
+                if isinstance(self.__hasAskedToFulfillPreorder, bytes)
+                else self.__hasAskedToFulfillPreorder
+            ),
+            limitedRepr(
+                self.__buyWithoutAuthorization[:20]
+                if isinstance(self.__buyWithoutAuthorization, bytes)
+                else self.__buyWithoutAuthorization
+            ),
+            limitedRepr(
+                self.__hasDoneAgeCheck[:20]
+                if isinstance(self.__hasDoneAgeCheck, bytes)
+                else self.__hasDoneAgeCheck
             ),
         )
