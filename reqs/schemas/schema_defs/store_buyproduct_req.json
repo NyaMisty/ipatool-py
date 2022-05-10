@@ -75,6 +75,9 @@
     },
     "hasDoneAgeCheck": {
       "type": "string"
+    },
+    "hasConfirmedPaymentSheet": {
+      "type": "string"
     }
     
   },
@@ -90,6 +93,7 @@
   "optional": [
     "ageCheck",
     "hasBeenAuthedForBuy",
+    "hasConfirmedPaymentSheet",
     "isInApp",
     
     "machineName",

@@ -111,6 +111,7 @@ class StoreClient(object):
             # ageCheck='true',
             # hasBeenAuthedForBuy='true',
             # isInApp='false',
+            hasConfirmedPaymentSheet='true',
         )
         payload = req.as_dict()
         # kbsync is bytes, but json schema does not support it, so we have to assign it
@@ -130,7 +131,7 @@ class StoreClient(object):
         return resp
 
     def buyProduct_purchase(self, appId, productType='C'):
-        url = "https://buy.itunes.apple.com/WebObjects/MZBuy.woa/wa/buyProduct"
+        url = "https://p25-buy.itunes.apple.com/WebObjects/MZBuy.woa/wa/buyProduct"
         req = StoreBuyproductReq(
             guid=self.guid,
             salableAdamId=str(appId),
@@ -143,6 +144,7 @@ class StoreClient(object):
             hasAskedToFulfillPreorder='true',
             buyWithoutAuthorization='true',
             hasDoneAgeCheck='true',
+            hasConfirmedPaymentSheet='true',
         )
         payload = req.as_dict()
 

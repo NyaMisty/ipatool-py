@@ -28,6 +28,7 @@ class StoreBuyproductReq:
         "hasAskedToFulfillPreorder": {"type": str, "subtype": None},
         "buyWithoutAuthorization": {"type": str, "subtype": None},
         "hasDoneAgeCheck": {"type": str, "subtype": None},
+        "hasConfirmedPaymentSheet": {"type": str, "subtype": None},
     }
     _formats_map = {}
     _validations_map = {
@@ -103,6 +104,9 @@ class StoreBuyproductReq:
         "hasDoneAgeCheck": {
             "required": False,
         },
+        "hasConfirmedPaymentSheet": {
+            "required": False,
+        },
     }
 
     def __init__(
@@ -131,6 +135,7 @@ class StoreBuyproductReq:
         hasAskedToFulfillPreorder: str = None,
         buyWithoutAuthorization: str = None,
         hasDoneAgeCheck: str = None,
+        hasConfirmedPaymentSheet: str = None,
     ):
         pass
         self.__ageCheck = ageCheck
@@ -157,6 +162,7 @@ class StoreBuyproductReq:
         self.__hasAskedToFulfillPreorder = hasAskedToFulfillPreorder
         self.__buyWithoutAuthorization = buyWithoutAuthorization
         self.__hasDoneAgeCheck = hasDoneAgeCheck
+        self.__hasConfirmedPaymentSheet = hasConfirmedPaymentSheet
 
     def _get_ageCheck(self):
         return self.__ageCheck
@@ -426,6 +432,17 @@ class StoreBuyproductReq:
 
     hasDoneAgeCheck = property(_get_hasDoneAgeCheck, _set_hasDoneAgeCheck)
 
+    def _get_hasConfirmedPaymentSheet(self):
+        return self.__hasConfirmedPaymentSheet
+
+    def _set_hasConfirmedPaymentSheet(self, value):
+        if value is not None and not isinstance(value, str):
+            raise TypeError("hasConfirmedPaymentSheet must be str")
+
+        self.__hasConfirmedPaymentSheet = value
+
+    hasConfirmedPaymentSheet = property(_get_hasConfirmedPaymentSheet, _set_hasConfirmedPaymentSheet)
+
     @staticmethod
     def from_dict(d):
         v = {}
@@ -560,6 +577,12 @@ class StoreBuyproductReq:
                 str.from_dict(d["hasDoneAgeCheck"])
                 if hasattr(str, "from_dict")
                 else d["hasDoneAgeCheck"]
+            )
+        if "hasConfirmedPaymentSheet" in d:
+            v["hasConfirmedPaymentSheet"] = (
+                str.from_dict(d["hasConfirmedPaymentSheet"])
+                if hasattr(str, "from_dict")
+                else d["hasConfirmedPaymentSheet"]
             )
         return StoreBuyproductReq(**v)
 
@@ -707,6 +730,12 @@ class StoreBuyproductReq:
                 if hasattr(self.__hasDoneAgeCheck, "as_dict")
                 else self.__hasDoneAgeCheck
             )
+        if self.__hasConfirmedPaymentSheet is not None:
+            d["hasConfirmedPaymentSheet"] = (
+                self.__hasConfirmedPaymentSheet.as_dict()
+                if hasattr(self.__hasConfirmedPaymentSheet, "as_dict")
+                else self.__hasConfirmedPaymentSheet
+            )
         return d
 
     def __repr__(self):
@@ -820,5 +849,10 @@ class StoreBuyproductReq:
                 self.__hasDoneAgeCheck[:20]
                 if isinstance(self.__hasDoneAgeCheck, bytes)
                 else self.__hasDoneAgeCheck
+            ),
+            limitedRepr(
+                self.__hasConfirmedPaymentSheet[:20]
+                if isinstance(self.__hasConfirmedPaymentSheet, bytes)
+                else self.__hasConfirmedPaymentSheet
             ),
         )
