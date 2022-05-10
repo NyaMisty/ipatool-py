@@ -2,7 +2,9 @@
 
 Python version of IPATool! 
 
-**Now Supports Downloading Old IPA via iTunes Server**
+**Now Supports**:
+  - **Purchasing App via `--purchase`**
+  - **Downloading Old IPA via iTunes Server**
 
 ## Installation
 
@@ -26,6 +28,11 @@ python3 main.py lookup -b com.touchingapp.potatsolite -c JP download -e APPLE_EM
 Or appID (`XXXXX` in the `apps.apple.com/app/xxxx/idXXXXXX`)
 ```
 python3 main.py download -i XXXXX
+```
+
+You can also purchase apps when downloading using `--purchase`:
+```
+python3 main.py lookup -b com.touchingapp.potatsolite -c JP download --purchase -e APPLE_EMAIL -p APPLE_PWD -o DIR
 ```
 
 ### Download OLD Version
