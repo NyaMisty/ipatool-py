@@ -40,13 +40,18 @@ python3 main.py lookup -b com.touchingapp.potatsolite -c JP download --purchase 
 Old versions must be downloaded together with `iTunes Server`. You can get `iTunes Server` in several ways:
 - Using [action-ipadown](https://github.com/NyaMisty/action-ipadown) directly, which integrated this tool
     - NOTE: this method does not support 2FA
-- Manually way: (supports 2FA)
+- Manually way with Windows: (supports 2FA)
     - download this repo: https://github.com/NyaMisty/actions-iTunes-header
     - install iTunes 12.6.5.3, from https://secure-appldnld.apple.com/itunes12/091-87819-20180912-69177170-B085-11E8-B6AB-C1D03409AD2A6/iTunes64Setup.exe
     - patch the iTunes using `actions-iTunes-header/workflow_helper/iTunesInstall/patch_itunes.py`
     - install frida: `pip3 install frida`
     - open iTunes, sign out & re-login your account
     - run: `actions-iTunes-header/workflow_helper/iTunesDownload/get_header.py`
+- Manually way with jailbroken iOS device: (supports 2FA)
+    - download [KbsyncTool](https://github.com/Lessica/KbsyncTool/releases)
+    - install `com.darwindev.kbsync_XXX.deb` on your jailbroken device
+    - exec `kbsynctool -s 9000` on your jailbroken device
+    - you will find log `Using -s http://192.168.100.227:9000/...`, use it as server address in next step
 
 After setting up the server, you can run this tool to download a specific version
 ```
