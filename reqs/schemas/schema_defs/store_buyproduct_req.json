@@ -78,8 +78,10 @@
     },
     "hasConfirmedPaymentSheet": {
       "type": "string"
+    },
+    "asn": {
+      "type": "string"
     }
-    
   },
   "required": [
     "guid",
@@ -94,6 +96,7 @@
     "ageCheck",
     "hasBeenAuthedForBuy",
     "hasConfirmedPaymentSheet",
+    "asn",
     "isInApp",
     
     "machineName",

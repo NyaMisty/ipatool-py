@@ -108,10 +108,11 @@ class StoreClient(object):
             productType=productType,
             pricingParameters=pricingParameters,
             
-            # ageCheck='true',
-            # hasBeenAuthedForBuy='true',
-            # isInApp='false',
+            ageCheck='true',
+            hasBeenAuthedForBuy='true',
+            isInApp='false',
             hasConfirmedPaymentSheet='true',
+            asn='1',
         )
         payload = req.as_dict()
         # kbsync is bytes, but json schema does not support it, so we have to assign it

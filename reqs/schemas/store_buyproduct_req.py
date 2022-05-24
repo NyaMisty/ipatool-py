@@ -29,6 +29,7 @@ class StoreBuyproductReq:
         "buyWithoutAuthorization": {"type": str, "subtype": None},
         "hasDoneAgeCheck": {"type": str, "subtype": None},
         "hasConfirmedPaymentSheet": {"type": str, "subtype": None},
+        "asn": {"type": str, "subtype": None},
     }
     _formats_map = {}
     _validations_map = {
@@ -107,6 +108,9 @@ class StoreBuyproductReq:
         "hasConfirmedPaymentSheet": {
             "required": False,
         },
+        "asn": {
+            "required": False,
+        },
     }
 
     def __init__(
@@ -136,6 +140,7 @@ class StoreBuyproductReq:
         buyWithoutAuthorization: str = None,
         hasDoneAgeCheck: str = None,
         hasConfirmedPaymentSheet: str = None,
+        asn: str = None,
     ):
         pass
         self.__ageCheck = ageCheck
@@ -163,6 +168,7 @@ class StoreBuyproductReq:
         self.__buyWithoutAuthorization = buyWithoutAuthorization
         self.__hasDoneAgeCheck = hasDoneAgeCheck
         self.__hasConfirmedPaymentSheet = hasConfirmedPaymentSheet
+        self.__asn = asn
 
     def _get_ageCheck(self):
         return self.__ageCheck
@@ -443,6 +449,17 @@ class StoreBuyproductReq:
 
     hasConfirmedPaymentSheet = property(_get_hasConfirmedPaymentSheet, _set_hasConfirmedPaymentSheet)
 
+    def _get_asn(self):
+        return self.__asn
+
+    def _set_asn(self, value):
+        if value is not None and not isinstance(value, str):
+            raise TypeError("asn must be str")
+
+        self.__asn = value
+
+    asn = property(_get_asn, _set_asn)
+
     @staticmethod
     def from_dict(d):
         v = {}
@@ -583,6 +600,12 @@ class StoreBuyproductReq:
                 str.from_dict(d["hasConfirmedPaymentSheet"])
                 if hasattr(str, "from_dict")
                 else d["hasConfirmedPaymentSheet"]
+            )
+        if "asn" in d:
+            v["asn"] = (
+                str.from_dict(d["asn"])
+                if hasattr(str, "from_dict")
+                else d["asn"]
             )
         return StoreBuyproductReq(**v)
 
@@ -736,6 +759,12 @@ class StoreBuyproductReq:
                 if hasattr(self.__hasConfirmedPaymentSheet, "as_dict")
                 else self.__hasConfirmedPaymentSheet
             )
+        if self.__asn is not None:
+            d["asn"] = (
+                self.__asn.as_dict()
+                if hasattr(self.__asn, "as_dict")
+                else self.__asn
+            )
         return d
 
     def __repr__(self):
@@ -854,5 +883,10 @@ class StoreBuyproductReq:
                 self.__hasConfirmedPaymentSheet[:20]
                 if isinstance(self.__hasConfirmedPaymentSheet, bytes)
                 else self.__hasConfirmedPaymentSheet
+            ),
+            limitedRepr(
+                self.__asn[:20]
+                if isinstance(self.__asn, bytes)
+                else self.__asn
             ),
         )
