@@ -82,7 +82,8 @@ class StoreClient(object):
 
         resp = StoreDownloadResp.from_dict(plistlib.loads(r.content))
         if resp.cancel_purchase_batch:
-            raise StoreException("volumeStoreDownloadProduct", resp, resp.customerMessage, resp.failureType + '-' + resp.metrics.dialogId)
+            dialogIdStr = ('-' + resp.metrics.dialogId) if resp.metrics and resp.metrics.dialogId else ''
+            raise StoreException("volumeStoreDownloadProduct", resp, resp.customerMessage, resp.failureType + dialogIdStr)
         return resp
 
     def buyProduct(self, appId, appVer='', productType='C', pricingParameters='STDQ'):
