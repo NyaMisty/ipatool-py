@@ -10,6 +10,8 @@ class StoreBuyproductReq:
         "hasBeenAuthedForBuy": {"type": str, "subtype": None},
         "isInApp": {"type": str, "subtype": None},
         "kbsync": {"type": str, "subtype": None},
+        "sbsync": {"type": str, "subtype": None},
+        "afds": {"type": str, "subtype": None},
         "machineName": {"type": str, "subtype": None},
         "mtApp": {"type": str, "subtype": None},
         "mtClientId": {"type": str, "subtype": None},
@@ -50,6 +52,12 @@ class StoreBuyproductReq:
         },
         "kbsync": {
             "required": True,
+        },
+        "sbsync": {
+            "required": False,
+        },
+        "afds": {
+            "required": False,
         },
         "machineName": {
             "required": False,
@@ -121,6 +129,8 @@ class StoreBuyproductReq:
         hasBeenAuthedForBuy: str = None,
         isInApp: str = None,
         kbsync: str = None,
+        sbsync: str = None,
+        afds: str = None,
         machineName: str = None,
         mtApp: str = None,
         mtClientId: str = None,
@@ -149,6 +159,8 @@ class StoreBuyproductReq:
         self.__hasBeenAuthedForBuy = hasBeenAuthedForBuy
         self.__isInApp = isInApp
         self.__kbsync = kbsync
+        self.__sbsync = sbsync
+        self.__afds = afds
         self.__machineName = machineName
         self.__mtApp = mtApp
         self.__mtClientId = mtClientId
@@ -235,6 +247,28 @@ class StoreBuyproductReq:
         self.__kbsync = value
 
     kbsync = property(_get_kbsync, _set_kbsync)
+
+    def _get_sbsync(self):
+        return self.__sbsync
+
+    def _set_sbsync(self, value):
+        if not isinstance(value, str):
+            raise TypeError("sbsync must be str")
+
+        self.__sbsync = value
+
+    sbsync = property(_get_sbsync, _set_sbsync)
+
+    def _get_afds(self):
+        return self.__afds
+
+    def _set_afds(self, value):
+        if not isinstance(value, str):
+            raise TypeError("afds must be str")
+        
+        self.__afds = value
+    
+    afds = property(_get_afds, _set_afds)
 
     def _get_machineName(self):
         return self.__machineName
@@ -495,6 +529,14 @@ class StoreBuyproductReq:
             v["kbsync"] = (
                 str.from_dict(d["kbsync"]) if hasattr(str, "from_dict") else d["kbsync"]
             )
+        if "sbsync" in d:
+            v["sbsync"] = (
+                str.from_dict(d["sbsync"]) if hasattr(str, "from_dict") else d["sbsync"]
+            )
+        if "afds" in d:
+            v["afds"] = (
+                str.from_dict(d["afds"]) if hasattr(str, "from_dict") else d["afds"]
+            )
         if "machineName" in d:
             v["machineName"] = (
                 str.from_dict(d["machineName"])
@@ -647,6 +689,18 @@ class StoreBuyproductReq:
                 if hasattr(self.__kbsync, "as_dict")
                 else self.__kbsync
             )
+        if self.__sbsync is not None:
+            d["sbsync"] = (
+                self.__sbsync.as_dict()
+                if hasattr(self.__sbsync, "as_dict")
+                else self.__sbsync
+            )
+        if self.__afds is not None:
+            d["afds"] = (
+                self.__afds.as_dict()
+                if hasattr(self.__afds, "as_dict")
+                else self.__afds
+            )
         if self.__machineName is not None:
             d["machineName"] = (
                 self.__machineName.as_dict()
@@ -768,7 +822,7 @@ class StoreBuyproductReq:
         return d
 
     def __repr__(self):
-        return "<Class StoreBuyproductReq. ageCheck: {}, appExtVrsId: {}, guid: {}, hasBeenAuthedForBuy: {}, isInApp: {}, kbsync: {}, machineName: {}, mtApp: {}, mtClientId: {}, mtEventTime: {}, mtPageId: {}, mtPageType: {}, mtPrevPage: {}, mtRequestId: {}, mtTopic: {}, needDiv: {}, pg: {}, price: {}, pricingParameters: {}, productType: {}, salableAdamId: {}, hasAskedToFulfillPreorder: {}, buyWithoutAuthorization: {}, hasDoneAgeCheck: {}>".format(
+        return "<Class StoreBuyproductReq. ageCheck: {}, appExtVrsId: {}, guid: {}, hasBeenAuthedForBuy: {}, isInApp: {}, kbsync: {}, sbsync: {}, afds: {}, machineName: {}, mtApp: {}, mtClientId: {}, mtEventTime: {}, mtPageId: {}, mtPageType: {}, mtPrevPage: {}, mtRequestId: {}, mtTopic: {}, needDiv: {}, pg: {}, price: {}, pricingParameters: {}, productType: {}, salableAdamId: {}, hasAskedToFulfillPreorder: {}, buyWithoutAuthorization: {}, hasDoneAgeCheck: {}>".format(
             limitedRepr(
                 self.__ageCheck[:20]
                 if isinstance(self.__ageCheck, bytes)
@@ -796,6 +850,16 @@ class StoreBuyproductReq:
                 self.__kbsync[:20]
                 if isinstance(self.__kbsync, bytes)
                 else self.__kbsync
+            ),
+            limitedRepr(
+                self.__sbsync[:20]
+                if isinstance(self.__sbsync, bytes)
+                else self.__sbsync
+            ),
+            limitedRepr(
+                self.__afds[:20]
+                if isinstance(self.__afds, bytes)
+                else self.__afds
             ),
             limitedRepr(
                 self.__machineName[:20]

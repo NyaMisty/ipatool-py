@@ -21,6 +21,12 @@
     "kbsync": {
       "type": "string"
     },
+    "sbsync": {
+      "type": "string"
+    },
+    "afds": {
+      "type": "string"
+    },
     "machineName": {
       "type": "string"
     },

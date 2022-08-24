@@ -115,8 +115,11 @@ class StoreClient(object):
             asn='1',
         )
         payload = req.as_dict()
-        # kbsync is bytes, but json schema does not support it, so we have to assign it
-        payload['kbsync'] = kbsync
+        payload['kbsync'] = kbsync  # kbsync is bytes, but json schema does not support it, so we have to assign it
+        if 'sbsync' in itunes_internal:
+            payload['sbsync'] = itunes_internal.pop('sbsync')  # sbsync is the same as kbsync
+        if 'afds' in itunes_internal:
+            payload['afds'] = itunes_internal.pop('afds')
 
         hdrs = dict(hdrs)
         hdrs["Content-Type"] = "application/x-apple-plist"
