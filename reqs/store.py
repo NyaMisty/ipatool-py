@@ -41,7 +41,7 @@ class StoreClient(object):
             break
         resp = StoreAuthenticateResp.from_dict(plistlib.loads(r.content))
         if not resp.m_allowed:
-            raise StoreException("authenticate", resp.customerMessage, resp.failureType)
+            raise StoreException("authenticate", resp, resp.customerMessage, resp.failureType)
 
         self.sess.headers['X-Dsid'] = self.sess.headers['iCloud-Dsid'] = str(resp.download_queue_info.dsid)
         self.sess.headers['X-Apple-Store-Front'] = r.headers.get('x-set-apple-store-front')

@@ -203,7 +203,8 @@ class IPATool(object):
     def _handleStoreException(self, _e):
         e = _e # type: StoreException
         logger.fatal("Store %s failed! Message: %s%s" % (e.req, e.errMsg, " (errorType %s)" % e.errType if e.errType else ''))
-        logger.fatal("    Raw Response: %s" % (e.resp.as_dict()))
+        if e.resp is not None:
+            logger.fatal("    Raw Response: %s" % (e.resp.as_dict()))
 
     def handleHistoryVersion(self, args):
         if args.appId:
