@@ -77,6 +77,7 @@ class IPATool(object):
         self.appId = None
         # self.appInfo = None
         self.appVerId = None
+        self.appVerIds = None
         
         self.jsonOut = None
     
@@ -107,6 +108,11 @@ class IPATool(object):
             auth_p = p.add_mutually_exclusive_group(required=True)
             auth_p._group_actions.append(passwd)
             auth_p._group_actions.append(itunessrv)
+
+        purchase_p = subp.add_parser('purchase')
+        add_auth_options(purchase_p)
+        purchase_p.add_argument('--appId', '-i', dest='appId')
+        purchase_p.set_defaults(func=self.handlePurchase)
 
         down_p = subp.add_parser('download')
         add_auth_options(down_p)
@@ -210,6 +216,16 @@ class IPATool(object):
         e = _e # type: StoreException
         logger.fatal("Store %s failed! Message: %s%s" % (e.req, e.errMsg, " (errorType %s)" % e.errType if e.errType else ''))
         logger.fatal("    Raw Response: %s" % (e.resp.as_dict()))
+    def handlePurchase(self, args):
+        Store = self._get_StoreClient(args)
+        logger.info('Try to purchasing appId %s' % (self.appId))
+        try:
+            Store.purchase(self.appId)
+        except StoreException as e:
+            if e.errMsg == 'purchased_before':
+                logger.warning('You have already purchased appId %s before' % (self.appId))
+            else:
+                raise
 
     def handleHistoryVersion(self, args):
         if args.appId:
