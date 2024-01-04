@@ -18,11 +18,13 @@ from rich.console import Console
 import rich
 
 rich.get_console().file = sys.stderr
+
+logging_handler = RichHandler(rich_tracebacks=True)
 logging.basicConfig(
     level="INFO",
     format="%(message)s",
     datefmt="[%X]",
-    handlers=[RichHandler(rich_tracebacks=True)]
+    handlers=[logging_handler]
 )
 logging.getLogger('urllib3').setLevel(logging.WARNING)
 logger = logging.getLogger('main')
@@ -119,7 +121,7 @@ class IPATool(object):
         down_p.add_argument('--appId', '-i', dest='appId')
         down_p.add_argument('--appVerId', dest='appVerId')
         down_p.add_argument('--purchase', action='store_true')
-
+        down_p.add_argument('--downloadAllVersion', action='store_true')
         down_p.add_argument('--output-dir', '-o', dest='output_dir', default='.')
         down_p.set_defaults(func=self.handleDownload)
 
@@ -215,7 +217,8 @@ class IPATool(object):
     def _handleStoreException(self, _e):
         e = _e # type: StoreException
         logger.fatal("Store %s failed! Message: %s%s" % (e.req, e.errMsg, " (errorType %s)" % e.errType if e.errType else ''))
-        logger.fatal("    Raw Response: %s" % (e.resp.as_dict()))
+        logger.fatal("    Raw Response: %s" % (e.resp))
+
     def handlePurchase(self, args):
         Store = self._get_StoreClient(args)
         logger.info('Try to purchasing appId %s' % (self.appId))
@@ -242,6 +245,7 @@ class IPATool(object):
 
             logger.info('Retriving download info for appId %s' % (self.appId))
             downResp = Store.download(self.appId)
+            logger.debug('Got download info: %s', downResp)
             
             if not downResp.songList:
                 logger.fatal("failed to get app download info!")
@@ -251,10 +255,28 @@ class IPATool(object):
             self._outputJson({
                 "appVerIds": downInfo.metadata.softwareVersionExternalIdentifiers
             })
+            self.appVerIds = downInfo.metadata.softwareVersionExternalIdentifiers
         except StoreException as e:
             self._handleStoreException(e)
 
     def handleDownload(self, args):
+        if args.downloadAllVersion:
+            self.handleHistoryVersion(args)
+            for appVerId in self.appVerIds:
+                self.jsonOut = None
+                try:
+                    self.appVerId = appVerId
+                    self.downloadOne(args)
+                    if args.out_json and self.jsonOut:
+                        print(json.dumps(self.jsonOut, ensure_ascii=False))
+                except Exception as e:
+                    logger.fatal("error during downloading appVerId %s", appVerId)
+                finally:
+                    self.jsonOut = None
+        else:
+            self.downloadOne(args)
+
+    def downloadOne(self, args):
         if args.appId:
             self.appId = args.appId
         if args.appVerId:
@@ -263,24 +285,19 @@ class IPATool(object):
         if not self.appId:
             logger.fatal("appId not supplied!")
             return
-        
+    
+        logger.info("Downloading appId %s appVerId %s", self.appId, self.appVerId)
         try:
             appleid = args.appleid
             Store = self._get_StoreClient(args)
 
             if args.purchase:
-                logger.info('Try to purchasing appId %s' % (self.appId))
-                try:
-                    Store.purchase(self.appId)
-                except StoreException as e:
-                    if e.errMsg == 'purchased_before':
-                        logger.warning('You have already purchased appId %s before' % (self.appId))
-                    else:
-                        raise
+                self.handlePurchase(args)
             
             logger.info('Retriving download info for appId %s%s' % (self.appId, " with versionId %s" % self.appVerId if self.appVerId else ""))
 
-            downResp = Store.download(self.appId, self.appVerId)
+            downResp = Store.download(self.appId, self.appVerId, isRedownload=not args.purchase)
+            logger.debug('Got download info: %s', downResp.as_dict())
             
             if not downResp.songList:
                 logger.fatal("failed to get app download info!")
