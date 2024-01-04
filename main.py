@@ -184,7 +184,14 @@ class IPATool(object):
 
         self._outputJson(ret)
 
+    storeClientCache = {}
     def _get_StoreClient(self, args):
+        for k, v in self.storeClientCache:
+            if time.time() - v < 30.0:
+                return k
+            else:
+                del self.storeClientCache[k]
+        
         Store = StoreClient(self.sess)
 
         if args.itunes_server:
