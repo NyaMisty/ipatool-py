@@ -312,17 +312,31 @@ class IPATool(object):
                 if appleid:
                     metadata["apple-id"] = appleid
                     metadata["userName"] = appleid
+                logger.debug("Writing iTunesMetadata.plist")
                 ipaFile.writestr(zipfile.ZipInfo("iTunesMetadata.plist", get_zipinfo_datetime()), plistlib.dumps(metadata))
+                logger.debug("Writing IPAToolInfo.plist")
+                ipaFile.writestr(zipfile.ZipInfo("IPAToolInfo.plist", get_zipinfo_datetime()), plistlib.dumps(downResp.as_dict()))
 
                 appContentDir = [c for c in ipaFile.namelist() if c.startswith('Payload/') and len(c.strip('/').split('/')) == 2][0]
                 appContentDir = appContentDir.rstrip('/')
 
-                scManifestData = ipaFile.read(appContentDir + '/SC_Info/Manifest.plist')
-                scManifest = plistlib.loads(scManifestData)
-
-                sinfs = {c.id: c.sinf for c in downInfo.sinfs}
-                for i, sinfPath in enumerate(scManifest['SinfPaths']):
-                    ipaFile.writestr(appContentDir + '/' + sinfPath, sinfs[i])
+                if (appContentDir + '/SC_Info/Manifest.plist') in ipaFile.namelist():
+                    #Try to get the Manifest.plist file, since it doesn't always exist.
+                    scManifestData = ipaFile.read(appContentDir + '/SC_Info/Manifest.plist')
+                    logger.debug("Got SC_Info/Manifest.plist: %s", scManifestData)
+                    scManifest = plistlib.loads(scManifestData)
+                    sinfs = {c.id: c.sinf for c in downInfo.sinfs}
+                    for i, sinfPath in enumerate(scManifest['SinfPaths']):
+                        logger.debug("Writing sinf to %s", sinfPath)
+                        ipaFile.writestr(appContentDir + '/' + sinfPath, sinfs[i])
+                else:
+                    logger.info('Manifest.plist does not exist! Assuming it is an old app without one...')
+                    infoListData = ipaFile.read(appContentDir + '/Info.plist') #Is this not loaded anywhere yet?
+                    infoList = plistlib.loads(infoListData)
+                    sinfPath = appContentDir + '/SC_Info/'+infoList['CFBundleExecutable']+".sinf"
+                    logger.debug("Writing sinf to %s", sinfPath)
+                    #Assuming there is only one .sinf file, hence the 0
+                    ipaFile.writestr(sinfPath, sinfs[0])
 
             logger.info("Downloaded ipa to %s" % filename)
 
