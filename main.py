@@ -127,6 +127,7 @@ class IPATool(object):
 
         his_p = subp.add_parser('historyver')
         his_p.add_argument('--appId', '-i', dest='appId')
+        his_p.add_argument('--purchase', action='store_true')
         add_auth_options(his_p)
         his_p.set_defaults(func=self.handleHistoryVersion)
 
@@ -251,8 +252,11 @@ class IPATool(object):
             Store = self._get_StoreClient(args)
 
             logger.info('Retriving download info for appId %s' % (self.appId))
-            downResp = Store.download(self.appId)
+            downResp = Store.download(self.appId, isRedownload=not args.purchase)
             logger.debug('Got download info: %s', downResp)
+            if args.purchase:
+                # We have already successfully purchased, so don't purchase again :)
+                args.purchase = False
             
             if not downResp.songList:
                 logger.fatal("failed to get app download info!")
