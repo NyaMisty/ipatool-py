@@ -37,9 +37,23 @@ def get_zipinfo_datetime(timestamp=None):
     timestamp = int(timestamp or time.time())
     return time.gmtime(timestamp)[0:6]
 
+def downloadFile(url, outfile, retries=10):
+    for retry in range(retries):
+        try:
+            _downloadFile(url, outfile)
+            break
+        except Exception as e:
+            logger.info("Error during downloading %s (retry %d/%d), error %s", url, retry, retries, e)
+            os.remove(outfile)
+    logger.info("Download success in retry %d", retry)
 
-def downloadFile(url, outfile):
-    with requests.get(url, stream=True) as r:
+download_sess = requests.Session()
+download_sess.headers = {"User-Agent": CONFIGURATOR_UA}
+DOWNLOAD_READ_TIMEOUT = 60.0
+def _downloadFile(url, outfile):
+    with download_sess.get(url, stream=True, timeout=DOWNLOAD_READ_TIMEOUT) as r:
+        if not r.headers.get('Content-Length'):
+            raise Exception("server is not returning Content-Length!")
         totalLen = int(r.headers.get('Content-Length', '0'))
         downLen = 0
         r.raise_for_status()
