@@ -360,7 +360,7 @@ class IPATool(object):
                     sinfPath = appContentDir + '/SC_Info/'+infoList['CFBundleExecutable']+".sinf"
                     logger.debug("Writing sinf to %s", sinfPath)
                     #Assuming there is only one .sinf file, hence the 0
-                    ipaFile.writestr(sinfPath, sinfs[0])
+                    ipaFile.writestr(sinfPath, downInfo.sinfs[0].sinf)
 
             logger.info("Downloaded ipa to %s" % filename)
 
