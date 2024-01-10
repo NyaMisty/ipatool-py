@@ -80,6 +80,21 @@ python3 main.py --json lookup -b com.touchingapp.potatsolite -c JP --get-verid
 python3 main.py --json lookup -b com.touchingapp.potatsolite -c JP historyver -e APPLE_EMAIL -p APPLE_PWD
 ```
 
+### For Large Scale Scraping
+
+You can download all versions of an app like this:
+```
+python3 main.py --json download --itunes-server http://XXX.XXX.XXX.XXX:9000 --appId 414478124 --purchase --downloadAllVersion
+```
+
+- In this mode, errors will only be logged instead of interrupting the whole process
+- For each downloaded app version, it will output a line of json in stdout like this:
+  ```
+  {"appName": "WeChat", "appBundleId": "com.tencent.xin", "appVer": "6.5.13.34", "appId": 414478124, "appVerId": 822899148, "downloadedIPA": "wechat\\com.tencent.xin-6.5.13.34-414478124-822899148.ipa", "downloadedVerId": 822899148}
+  ```
+  Logs will only be printed to stderr, so you can parse this line for automation. 
+
+
 ## Development
 
 - All requests' reqBody and respBody are modeled using modified JSONSchema2PoPo2 (see my NyaMisty/JSONSchema2PoPo2), you can regenerate the binding by cd into `reqs/schemas` and execute `python3 -m schema_defs`
