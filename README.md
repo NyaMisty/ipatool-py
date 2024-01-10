@@ -58,6 +58,8 @@ After setting up the server, you can run this tool to download a specific versio
 python3 main.py lookup -b com.touchingapp.potatsolite -c JP download -s http://127.0.0.1:9000 --appVerId 833889087
 ```
 
+NOTE: Some users are reporting that you need to **authorize computer** and make first purchase in iTunes with marked "do not ask for password" before using the iTunes server. (See #26)
+
 ### Get History Ver (usually used together with JSON)
 
 Get all appVerId of app from Apple
@@ -84,6 +86,21 @@ For each command you can use `--json` switch to get result of command in JSON
 python3 main.py --json lookup -b com.touchingapp.potatsolite -c JP --get-verid
 python3 main.py --json lookup -b com.touchingapp.potatsolite -c JP historyver -e APPLE_EMAIL -p APPLE_PWD
 ```
+
+### For Large Scale Scraping
+
+You can download all versions of an app like this:
+```
+python3 main.py --json download --itunes-server http://XXX.XXX.XXX.XXX:9000 --appId 414478124 --purchase --downloadAllVersion
+```
+
+- In this mode, errors will only be logged instead of interrupting the whole process
+- For each downloaded app version, it will output a line of json in stdout like this:
+  ```
+  {"appName": "WeChat", "appBundleId": "com.tencent.xin", "appVer": "6.5.13.34", "appId": 414478124, "appVerId": 822899148, "downloadedIPA": "wechat\\com.tencent.xin-6.5.13.34-414478124-822899148.ipa", "downloadedVerId": 822899148}
+  ```
+  Logs will only be printed to stderr, so you can parse this line for automation. 
+
 
 ## Development
 
