@@ -315,7 +315,9 @@ class IPATool(object):
             appId = downInfo.songId
             appBundleId = downInfo.metadata.softwareVersionBundleId
             appVerId = downInfo.metadata.softwareVersionExternalIdentifier
-            appVer = downInfo.metadata.bundleShortVersionString
+            # when downloading history versions, bundleShortVersionString will always give a wrong version number (the newest one)
+            # should use bundleVersion in these cases
+            appVer = downInfo.metadata.bundleShortVersionString if not self.appVerId else downInfo.metadata.bundleVersion
 
             logger.info(f'Downloading app {appName} ({appBundleId}) with appId {appId} (version {appVer}, versionId {appVerId})')
 
