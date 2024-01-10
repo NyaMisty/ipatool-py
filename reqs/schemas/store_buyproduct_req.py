@@ -10,6 +10,8 @@ class StoreBuyproductReq:
         "hasBeenAuthedForBuy": {"type": str, "subtype": None},
         "isInApp": {"type": str, "subtype": None},
         "kbsync": {"type": str, "subtype": None},
+        "sbsync": {"type": str, "subtype": None},
+        "afds": {"type": str, "subtype": None},
         "machineName": {"type": str, "subtype": None},
         "mtApp": {"type": str, "subtype": None},
         "mtClientId": {"type": str, "subtype": None},
@@ -28,6 +30,8 @@ class StoreBuyproductReq:
         "hasAskedToFulfillPreorder": {"type": str, "subtype": None},
         "buyWithoutAuthorization": {"type": str, "subtype": None},
         "hasDoneAgeCheck": {"type": str, "subtype": None},
+        "hasConfirmedPaymentSheet": {"type": str, "subtype": None},
+        "asn": {"type": str, "subtype": None},
     }
     _formats_map = {}
     _validations_map = {
@@ -48,6 +52,12 @@ class StoreBuyproductReq:
         },
         "kbsync": {
             "required": True,
+        },
+        "sbsync": {
+            "required": False,
+        },
+        "afds": {
+            "required": False,
         },
         "machineName": {
             "required": False,
@@ -103,6 +113,12 @@ class StoreBuyproductReq:
         "hasDoneAgeCheck": {
             "required": False,
         },
+        "hasConfirmedPaymentSheet": {
+            "required": False,
+        },
+        "asn": {
+            "required": False,
+        },
     }
 
     def __init__(
@@ -113,6 +129,8 @@ class StoreBuyproductReq:
         hasBeenAuthedForBuy: str = None,
         isInApp: str = None,
         kbsync: str = None,
+        sbsync: str = None,
+        afds: str = None,
         machineName: str = None,
         mtApp: str = None,
         mtClientId: str = None,
@@ -131,6 +149,8 @@ class StoreBuyproductReq:
         hasAskedToFulfillPreorder: str = None,
         buyWithoutAuthorization: str = None,
         hasDoneAgeCheck: str = None,
+        hasConfirmedPaymentSheet: str = None,
+        asn: str = None,
     ):
         pass
         self.__ageCheck = ageCheck
@@ -139,6 +159,8 @@ class StoreBuyproductReq:
         self.__hasBeenAuthedForBuy = hasBeenAuthedForBuy
         self.__isInApp = isInApp
         self.__kbsync = kbsync
+        self.__sbsync = sbsync
+        self.__afds = afds
         self.__machineName = machineName
         self.__mtApp = mtApp
         self.__mtClientId = mtClientId
@@ -157,6 +179,8 @@ class StoreBuyproductReq:
         self.__hasAskedToFulfillPreorder = hasAskedToFulfillPreorder
         self.__buyWithoutAuthorization = buyWithoutAuthorization
         self.__hasDoneAgeCheck = hasDoneAgeCheck
+        self.__hasConfirmedPaymentSheet = hasConfirmedPaymentSheet
+        self.__asn = asn
 
     def _get_ageCheck(self):
         return self.__ageCheck
@@ -223,6 +247,28 @@ class StoreBuyproductReq:
         self.__kbsync = value
 
     kbsync = property(_get_kbsync, _set_kbsync)
+
+    def _get_sbsync(self):
+        return self.__sbsync
+
+    def _set_sbsync(self, value):
+        if not isinstance(value, str):
+            raise TypeError("sbsync must be str")
+
+        self.__sbsync = value
+
+    sbsync = property(_get_sbsync, _set_sbsync)
+
+    def _get_afds(self):
+        return self.__afds
+
+    def _set_afds(self, value):
+        if not isinstance(value, str):
+            raise TypeError("afds must be str")
+        
+        self.__afds = value
+    
+    afds = property(_get_afds, _set_afds)
 
     def _get_machineName(self):
         return self.__machineName
@@ -426,6 +472,28 @@ class StoreBuyproductReq:
 
     hasDoneAgeCheck = property(_get_hasDoneAgeCheck, _set_hasDoneAgeCheck)
 
+    def _get_hasConfirmedPaymentSheet(self):
+        return self.__hasConfirmedPaymentSheet
+
+    def _set_hasConfirmedPaymentSheet(self, value):
+        if value is not None and not isinstance(value, str):
+            raise TypeError("hasConfirmedPaymentSheet must be str")
+
+        self.__hasConfirmedPaymentSheet = value
+
+    hasConfirmedPaymentSheet = property(_get_hasConfirmedPaymentSheet, _set_hasConfirmedPaymentSheet)
+
+    def _get_asn(self):
+        return self.__asn
+
+    def _set_asn(self, value):
+        if value is not None and not isinstance(value, str):
+            raise TypeError("asn must be str")
+
+        self.__asn = value
+
+    asn = property(_get_asn, _set_asn)
+
     @staticmethod
     def from_dict(d):
         v = {}
@@ -460,6 +528,14 @@ class StoreBuyproductReq:
         if "kbsync" in d:
             v["kbsync"] = (
                 str.from_dict(d["kbsync"]) if hasattr(str, "from_dict") else d["kbsync"]
+            )
+        if "sbsync" in d:
+            v["sbsync"] = (
+                str.from_dict(d["sbsync"]) if hasattr(str, "from_dict") else d["sbsync"]
+            )
+        if "afds" in d:
+            v["afds"] = (
+                str.from_dict(d["afds"]) if hasattr(str, "from_dict") else d["afds"]
             )
         if "machineName" in d:
             v["machineName"] = (
@@ -561,6 +637,18 @@ class StoreBuyproductReq:
                 if hasattr(str, "from_dict")
                 else d["hasDoneAgeCheck"]
             )
+        if "hasConfirmedPaymentSheet" in d:
+            v["hasConfirmedPaymentSheet"] = (
+                str.from_dict(d["hasConfirmedPaymentSheet"])
+                if hasattr(str, "from_dict")
+                else d["hasConfirmedPaymentSheet"]
+            )
+        if "asn" in d:
+            v["asn"] = (
+                str.from_dict(d["asn"])
+                if hasattr(str, "from_dict")
+                else d["asn"]
+            )
         return StoreBuyproductReq(**v)
 
     def as_dict(self):
@@ -600,6 +688,18 @@ class StoreBuyproductReq:
                 self.__kbsync.as_dict()
                 if hasattr(self.__kbsync, "as_dict")
                 else self.__kbsync
+            )
+        if self.__sbsync is not None:
+            d["sbsync"] = (
+                self.__sbsync.as_dict()
+                if hasattr(self.__sbsync, "as_dict")
+                else self.__sbsync
+            )
+        if self.__afds is not None:
+            d["afds"] = (
+                self.__afds.as_dict()
+                if hasattr(self.__afds, "as_dict")
+                else self.__afds
             )
         if self.__machineName is not None:
             d["machineName"] = (
@@ -707,10 +807,22 @@ class StoreBuyproductReq:
                 if hasattr(self.__hasDoneAgeCheck, "as_dict")
                 else self.__hasDoneAgeCheck
             )
+        if self.__hasConfirmedPaymentSheet is not None:
+            d["hasConfirmedPaymentSheet"] = (
+                self.__hasConfirmedPaymentSheet.as_dict()
+                if hasattr(self.__hasConfirmedPaymentSheet, "as_dict")
+                else self.__hasConfirmedPaymentSheet
+            )
+        if self.__asn is not None:
+            d["asn"] = (
+                self.__asn.as_dict()
+                if hasattr(self.__asn, "as_dict")
+                else self.__asn
+            )
         return d
 
     def __repr__(self):
-        return "<Class StoreBuyproductReq. ageCheck: {}, appExtVrsId: {}, guid: {}, hasBeenAuthedForBuy: {}, isInApp: {}, kbsync: {}, machineName: {}, mtApp: {}, mtClientId: {}, mtEventTime: {}, mtPageId: {}, mtPageType: {}, mtPrevPage: {}, mtRequestId: {}, mtTopic: {}, needDiv: {}, pg: {}, price: {}, pricingParameters: {}, productType: {}, salableAdamId: {}, hasAskedToFulfillPreorder: {}, buyWithoutAuthorization: {}, hasDoneAgeCheck: {}>".format(
+        return "<Class StoreBuyproductReq. ageCheck: {}, appExtVrsId: {}, guid: {}, hasBeenAuthedForBuy: {}, isInApp: {}, kbsync: {}, sbsync: {}, afds: {}, machineName: {}, mtApp: {}, mtClientId: {}, mtEventTime: {}, mtPageId: {}, mtPageType: {}, mtPrevPage: {}, mtRequestId: {}, mtTopic: {}, needDiv: {}, pg: {}, price: {}, pricingParameters: {}, productType: {}, salableAdamId: {}, hasAskedToFulfillPreorder: {}, buyWithoutAuthorization: {}, hasDoneAgeCheck: {}>".format(
             limitedRepr(
                 self.__ageCheck[:20]
                 if isinstance(self.__ageCheck, bytes)
@@ -738,6 +850,16 @@ class StoreBuyproductReq:
                 self.__kbsync[:20]
                 if isinstance(self.__kbsync, bytes)
                 else self.__kbsync
+            ),
+            limitedRepr(
+                self.__sbsync[:20]
+                if isinstance(self.__sbsync, bytes)
+                else self.__sbsync
+            ),
+            limitedRepr(
+                self.__afds[:20]
+                if isinstance(self.__afds, bytes)
+                else self.__afds
             ),
             limitedRepr(
                 self.__machineName[:20]
@@ -820,5 +942,15 @@ class StoreBuyproductReq:
                 self.__hasDoneAgeCheck[:20]
                 if isinstance(self.__hasDoneAgeCheck, bytes)
                 else self.__hasDoneAgeCheck
+            ),
+            limitedRepr(
+                self.__hasConfirmedPaymentSheet[:20]
+                if isinstance(self.__hasConfirmedPaymentSheet, bytes)
+                else self.__hasConfirmedPaymentSheet
+            ),
+            limitedRepr(
+                self.__asn[:20]
+                if isinstance(self.__asn, bytes)
+                else self.__asn
             ),
         )

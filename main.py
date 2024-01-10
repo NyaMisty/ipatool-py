@@ -224,11 +224,16 @@ class IPATool(object):
                 kbsync = bytes.fromhex(ret.pop('kbsync'))
                 guid = ret.pop('guid')
                 retHdrs = ret.pop('headers')
-                return {
+                handled = {
                     'headers': retHdrs,
                     'kbsync': kbsync,
                     'guid': guid,
                 }
+                if 'sbsync' in ret:
+                    handled['sbsync'] = bytes.fromhex(ret.pop('sbsync'))
+                if 'afds' in ret:
+                    handled['afds'] = ret.pop('afds')
+                return handled
             Store.iTunes_provider = handle_iTunes_provider
         else:
             appleid = args.appleid
