@@ -343,8 +343,19 @@ class IPATool(object):
                 logger.debug("Writing IPAToolInfo.plist")
                 ipaFile.writestr(zipfile.ZipInfo("IPAToolInfo.plist", get_zipinfo_datetime()), plistlib.dumps(downResp.as_dict()))
 
-                appContentDir = [c for c in ipaFile.namelist() if c.startswith('Payload/') and len(c.strip('/').split('/')) == 2][0]
-                appContentDir = appContentDir.rstrip('/')
+                def findAppContentPath(c):
+                    if not c.startswith('Payload/'):
+                        return False
+                    pathparts = c.strip('/').split('/')
+                    if len(pathparts) != 2:
+                        return False
+                    if not pathparts[1].endswith(".app"):
+                        return False
+                    return True
+                appContentDirChoices = [c for c in ipaFile.namelist() if findAppContentPath(c)]
+                if len(appContentDirChoices) != 1:
+                    raise Exception("failed to find appContentDir, choices %s", appContentDirChoices)
+                appContentDir = appContentDirChoices[0].rstrip('/')
 
                 if (appContentDir + '/SC_Info/Manifest.plist') in ipaFile.namelist():
                     #Try to get the Manifest.plist file, since it doesn't always exist.
