@@ -1,3 +1,4 @@
+import hashlib
 import plistlib
 import requests
 from reqs.schemas.store_authenticate_req import StoreAuthenticateReq
@@ -22,14 +23,37 @@ class StoreException(Exception):
 CONFIGURATOR_UA = 'Configurator/2.0 (Macintosh; OS X 10.12.6; 16G29) AppleWebKit/2603.3.8 iOS/14.2 hwp/t8020'
 
 class StoreClient(object):
-    def __init__(self, sess: requests.Session, guid: str = '000C2941396B'):
+    def __init__(self, sess: requests.Session, guid: str = None):
         self.sess = sess
-        self.guid = guid
+        self.guid = guid # the guid will not be used in itunes server mode
         self.accountName = None
         self.iTunes_provider = None
         self.authHeaders = None
 
+    def _generateGuid(self, appleId):
+        '''
+        Derive a GUID for an appleId. For each appleId, the GUID will always remain the same
+        :param appleId:
+        :return:
+        '''
+        DEFAULT_GUID = '000C2941396B'  # this GUID is blocked
+        # number of chars to use from DEFAULT_GUID as prefix (0..12)
+        GUID_DEFAULT_PREFIX = 2
+        # something unique
+        GUID_SEED = 'CAFEBABE'
+        # something between 0 and 30
+        GUID_POS = 10
+
+        # generate a unique guid out of the appleId
+        h = hashlib.sha1((GUID_SEED + appleId + GUID_SEED).encode("utf-8")).hexdigest()
+        defaultPart = DEFAULT_GUID[:GUID_DEFAULT_PREFIX]
+        hashPart = h[GUID_POS: GUID_POS + (len(DEFAULT_GUID) - GUID_DEFAULT_PREFIX)]
+        guid = (defaultPart + hashPart).upper()
+        return guid
+
     def authenticate(self, appleId, password):
+        if not self.guid:
+            self.guid = self._generateGuid(appleId)
         req = StoreAuthenticateReq(appleId=appleId, password=password, attempt='4', createSession="true", guid=self.guid, rmp='0', why='signIn')
         url = "https://p46-buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/authenticate?guid=%s" % self.guid
         while True:

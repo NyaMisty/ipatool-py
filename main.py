@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import json
 import os
+import pickle
 import sys
 import time
 import zipfile
@@ -112,6 +113,8 @@ class IPATool(object):
             auth_p = p.add_argument_group('Auth Options', 'Must specify either Apple ID & Password, or iTunes Server URL')
             appleid = auth_p.add_argument('--appleid', '-e')
             passwd = auth_p.add_argument('--password', '-p')
+            sessdir = auth_p.add_argument('--session-dir', dest='session_dir', default=None)
+
             itunessrv = auth_p.add_argument('--itunes-server', '-s', dest='itunes_server')
 
             ## Multiple hack here just to achieve (appleid & password) || itunes_server
@@ -120,6 +123,7 @@ class IPATool(object):
             auth_p = p.add_mutually_exclusive_group(required=True)
             auth_p._group_actions.append(appleid)
             auth_p._group_actions.append(itunessrv)
+            auth_p._group_actions.append(sessdir)
 
             auth_p = p.add_mutually_exclusive_group(required=True)
             auth_p._group_actions.append(passwd)
@@ -230,10 +234,25 @@ class IPATool(object):
             appleid = args.appleid
             applepass = args.password
 
-            logger.info("Logging into iTunes...")
+            session_cache = os.path.join(args.session_dir, args.appleid) if args.session_dir else None
+            if session_cache and os.path.exists(session_cache):
+                with open(session_cache, "rb") as file:
+                    try:
+                        Store.sess = pickle.load(file=file)
+                    except Exception as e:
+                        logger.warning(f"Error loading session {session_cache}")
+                        os.unlink(session_cache)
+                logger.info('Loaded session for %s [%s]' % (Store.accountName, Store.guid))
+            else:
+                logger.info("Logging into iTunes as %s ..." % appleid)
 
-            Store.authenticate(appleid, applepass)
-            logger.info('Logged in as %s' % Store.accountName)
+                Store.authenticate(appleid, applepass)
+                logger.info('Logged in as %s [%s]' % (Store.accountName, Store.guid))
+
+                if session_cache:
+                    with open(session_cache, "wb+") as file:
+                        pickle.dump(Store.sess, file=file)
+
         return Store
 
     def _handleStoreException(self, _e):
@@ -271,7 +290,7 @@ class IPATool(object):
             if args.purchase:
                 # We have already successfully purchased, so don't purchase again :)
                 args.purchase = False
-            
+
             if not downResp.songList:
                 logger.fatal("failed to get app download info!")
                 raise StoreException('download', downResp, 'no songList')
@@ -404,6 +423,7 @@ class IPATool(object):
 
                 "downloadedIPA": filepath,
                 "downloadedVerId": appVerId,
+                "downloadURL": downInfo.URL,
             })
         except StoreException as e:
             self._handleStoreException(e)
