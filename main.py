@@ -228,7 +228,7 @@ class IPATool(object):
 
     storeClientCache = {}
     def _get_StoreClient(self, args):
-        for k, v in self.storeClientCache:
+        for k, v in self.storeClientCache.items():
             if time.time() - v < 30.0:
                 return k
             else:
@@ -312,6 +312,7 @@ class IPATool(object):
             Store.sess.original_post = Store.sess.post
             Store.sess.post = authedPost
 
+        self.storeClientCache[Store] = time.time()
         return Store
 
     def _handleStoreException(self, _e):
