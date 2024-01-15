@@ -1,4 +1,6 @@
 import hashlib
+import json
+import pickle
 import plistlib
 import requests
 from reqs.schemas.store_authenticate_req import StoreAuthenticateReq
@@ -22,13 +24,17 @@ class StoreException(Exception):
 #CONFIGURATOR_UA = "Configurator/2.0 (Macintosh; OS X 10.12.6; 16G29) AppleWebKit/2603.3.8"
 CONFIGURATOR_UA = 'Configurator/2.0 (Macintosh; OS X 10.12.6; 16G29) AppleWebKit/2603.3.8 iOS/14.2 hwp/t8020'
 
-class StoreClient(object):
-    def __init__(self, sess: requests.Session, guid: str = None):
-        self.sess = sess
-        self.guid = guid # the guid will not be used in itunes server mode
+class StoreClientAuth(object):
+    def __init__(self, appleId=None, password=None):
+        self.appleId = appleId
+        self.password = password
+        self.guid = None  # the guid will not be used in itunes server mode
         self.accountName = None
-        self.iTunes_provider = None
         self.authHeaders = None
+        self.authCookies = None
+
+    def __str__(self):
+        return f"<{self.accountName} [{self.guid}]>"
 
     def _generateGuid(self, appleId):
         '''
@@ -51,18 +57,20 @@ class StoreClient(object):
         guid = (defaultPart + hashPart).upper()
         return guid
 
-    def authenticate(self, appleId, password):
+    def login(self, sess):
         if not self.guid:
-            self.guid = self._generateGuid(appleId)
-        req = StoreAuthenticateReq(appleId=appleId, password=password, attempt='4', createSession="true", guid=self.guid, rmp='0', why='signIn')
+            self.guid = self._generateGuid(self.appleId)
+
+        req = StoreAuthenticateReq(appleId=self.appleId, password=self.password, attempt='4', createSession="true",
+                                   guid=self.guid, rmp='0', why='signIn')
         url = "https://p46-buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/authenticate?guid=%s" % self.guid
         while True:
-            r = self.sess.post(url,
-                      headers={
-                          "Accept": "*/*",
-                          "Content-Type": "application/x-www-form-urlencoded",
-                          "User-Agent": CONFIGURATOR_UA,
-                      }, data=plistlib.dumps(req.as_dict()), allow_redirects=False)
+            r = sess.post(url,
+                               headers={
+                                   "Accept": "*/*",
+                                   "Content-Type": "application/x-www-form-urlencoded",
+                                   "User-Agent": CONFIGURATOR_UA,
+                               }, data=plistlib.dumps(req.as_dict()), allow_redirects=False)
             if r.status_code == 302:
                 url = r.headers['Location']
                 continue
@@ -73,13 +81,44 @@ class StoreClient(object):
             raise StoreException("authenticate", d, resp.customerMessage, resp.failureType)
 
         self.authHeaders = {}
-        self.authHeaders['X-Dsid'] = self.sess.headers['iCloud-Dsid'] = str(resp.download_queue_info.dsid)
+        self.authHeaders['X-Dsid'] = self.authHeaders['iCloud-Dsid'] = str(resp.download_queue_info.dsid)
         self.authHeaders['X-Apple-Store-Front'] = r.headers.get('x-set-apple-store-front')
         self.authHeaders['X-Token'] = resp.passwordToken
-        
-        self.sess.headers = dict(self.authHeaders)
+        self.authCookies = pickle.dumps(sess.cookies).hex()
+
         self.accountName = resp.accountInfo.address.firstName + " " + resp.accountInfo.address.lastName
-        return resp
+    def save(self):
+        return json.dumps(self.__dict__)
+
+    @classmethod
+    def load(cls, j):
+        obj = json.loads(j)
+        ret = cls()
+        ret.__dict__.update(obj)
+        return ret
+
+class StoreClient(object):
+    def __init__(self, sess: requests.Session):
+        self.sess = sess
+        self.iTunes_provider = None
+        self.authInfo = None
+
+    def authenticate_load_session(self, sessionContent):
+        self.authInfo = StoreClientAuth.load(sessionContent)
+        if self.authInfo.authHeaders is None or self.authInfo.authCookies is None:
+            raise Exception("invalid auth session")
+        self.sess.headers = dict(self.authInfo.authHeaders)
+        self.sess.cookies = pickle.loads(bytes.fromhex(self.authInfo.authCookies))
+
+    def authenticate_save_session(self):
+        return self.authInfo.save()
+
+    def authenticate(self, appleId, password):
+        if not self.authInfo:
+            self.authInfo = StoreClientAuth(appleId, password)
+        self.authInfo.login(self.sess)
+        self.sess.headers = dict(self.authInfo.authHeaders)
+        self.sess.cookies = pickle.loads(bytes.fromhex(self.authInfo.authCookies))
 
     # ==> 🛠   [Verbose] Performing request: curl -k -X POST \
     # -H "iCloud-DSID: 12263680861" \
@@ -101,12 +140,12 @@ class StoreClient(object):
     # ' \
     # https://p25-buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/volumeStoreDownloadProduct?guid=000C2941396Bk
     def volumeStoreDownloadProduct(self, appId, appVerId=""):
-        req = StoreDownloadReq(creditDisplay="", guid=self.guid, salableAdamId=appId, appExtVrsId=appVerId)
+        req = StoreDownloadReq(creditDisplay="", guid=self.authInfo.guid, salableAdamId=appId, appExtVrsId=appVerId)
         hdrs = {
                "Content-Type": "application/x-www-form-urlencoded",
                "User-Agent": CONFIGURATOR_UA,
            }
-        url = "https://p25-buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/volumeStoreDownloadProduct?guid=%s" % self.guid
+        url = "https://p25-buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/volumeStoreDownloadProduct?guid=%s" % self.authInfo.guid
         payload = req.as_dict()
         r = self.sess.post(url,
                            headers=hdrs,
@@ -170,7 +209,7 @@ class StoreClient(object):
     def buyProduct_purchase(self, appId, productType='C'):
         url = "https://buy.itunes.apple.com/WebObjects/MZBuy.woa/wa/buyProduct"
         req = StoreBuyproductReq(
-            guid=self.guid,
+            guid=self.authInfo.guid,
             salableAdamId=str(appId),
             appExtVrsId='0',
 

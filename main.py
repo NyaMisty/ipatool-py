@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-import json
 import os
 import pickle
 import sys
@@ -123,7 +122,7 @@ class IPATool(object):
             auth_p = p.add_mutually_exclusive_group(required=True)
             auth_p._group_actions.append(appleid)
             auth_p._group_actions.append(itunessrv)
-            auth_p._group_actions.append(sessdir)
+            # auth_p._group_actions.append(sessdir)
 
             auth_p = p.add_mutually_exclusive_group(required=True)
             auth_p._group_actions.append(passwd)
@@ -210,8 +209,9 @@ class IPATool(object):
                 return k
             else:
                 del self.storeClientCache[k]
-        
-        Store = StoreClient(self.sess)
+
+        newSess = pickle.loads(pickle.dumps(self.sess))
+        Store = StoreClient(newSess)
 
         if args.itunes_server:
             logger.info("Using iTunes interface %s to download app!" % args.itunes_server)
@@ -239,24 +239,51 @@ class IPATool(object):
             appleid = args.appleid
             applepass = args.password
 
+            needLogin = True
             session_cache = os.path.join(args.session_dir, args.appleid) if args.session_dir else None
             if session_cache and os.path.exists(session_cache):
-                with open(session_cache, "rb") as file:
-                    try:
-                        Store.sess = pickle.load(file=file)
-                    except Exception as e:
-                        logger.warning(f"Error loading session {session_cache}")
-                        os.unlink(session_cache)
-                logger.info('Loaded session for %s [%s]' % (Store.accountName, Store.guid))
-            else:
+                needLogin = False
+                with open(session_cache, "r") as f:
+                    content = f.read()
+                try:
+                    Store.authenticate_load_session(content)
+                except Exception as e:
+                    logger.warning(f"Error loading session {session_cache}")
+                    os.unlink(session_cache)
+                    needLogin = True
+                else:
+                    logger.info('Loaded session for %s' % (str(Store.authInfo)))
+            if needLogin:
                 logger.info("Logging into iTunes as %s ..." % appleid)
 
                 Store.authenticate(appleid, applepass)
-                logger.info('Logged in as %s [%s]' % (Store.accountName, Store.guid))
+                logger.info('Logged in as %s' % (str(Store.authInfo)))
 
                 if session_cache:
-                    with open(session_cache, "wb+") as file:
-                        pickle.dump(Store.sess, file=file)
+                    with open(session_cache, "w") as f:
+                        f.write(Store.authenticate_save_session())
+
+            def authedPost(*args, **kwargs):
+                if 'MZFinance.woa/wa/authenticate' in args[0]:
+                    return Store.sess.original_post(*args, **kwargs)
+                for i in range(3):
+                    r = Store.sess.original_post(*args, **kwargs)
+                    isAuthFail = False
+                    try:
+                        d = plistlib.loads(r.content)
+                        if str(d['failureType']) in ("2034", "1008"):
+                            isAuthFail = True
+                    except:
+                        return r
+                    if not isAuthFail:
+                        return r
+                    Store.authenticate(appleid, applepass)
+                    if session_cache:
+                        with open(session_cache, "w") as f:
+                            f.write(Store.authenticate_save_session())
+                    continue
+            Store.sess.original_post = Store.sess.post
+            Store.sess.post = authedPost
 
         return Store
 
