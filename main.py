@@ -219,7 +219,7 @@ class IPATool(object):
         }
 
         if args.get_verid:
-            logger.info("Retriving verId using iTunes webpage...")
+            logger.info("Retrieving verId using iTunes webpage...")
             verId = iTunes.getAppVerId(self.appId, args.country)
             logger.info("Got current verId using iTunes webpage: %s" % verId)
             ret["appVerId"] = verId
@@ -321,7 +321,7 @@ class IPATool(object):
 
     def handlePurchase(self, args):
         Store = self._get_StoreClient(args)
-        logger.info('Try to purchasing appId %s' % (self.appId))
+        logger.info('Try to purchase appId %s' % (self.appId))
         try:
             Store.purchase(self.appId)
         except StoreException as e:
@@ -352,12 +352,12 @@ class IPATool(object):
                     self.appVerIds = cacheContent['appVerIds']
                     return
 
-        logger.info('Retriving history version for appId %s' % self.appId)
+        logger.info('Retrieving history version for appId %s' % self.appId)
 
         try:
             Store = self._get_StoreClient(args)
 
-            logger.info('Retriving download info for appId %s' % (self.appId))
+            logger.info('Retrieving download info for appId %s' % (self.appId))
             if args.purchase:
                 logger.info('Purchasing appId %s' % (self.appId))
                 # We have already successfully purchased, so don't purchase again :)
@@ -453,7 +453,7 @@ class IPATool(object):
             if args.purchase:
                 self.handlePurchase(args)
             
-            logger.info('Retriving download info for appId %s%s' % (self.appId, " with versionId %s" % self.appVerId if self.appVerId else ""))
+            logger.info('Retrieving download info for appId %s%s' % (self.appId, " with versionId %s" % self.appVerId if self.appVerId else ""))
 
             downResp = Store.download(self.appId, self.appVerId, isRedownload=not args.purchase)
             logger.debug('Got download info: %s', downResp.as_dict())
