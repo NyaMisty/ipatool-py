@@ -549,7 +549,7 @@ class IPATool(object):
 
 def main():
     tool = IPATool()
-
     tool.tool_main()
 
-main()
+if __name__ == '__main__':
+    main()
