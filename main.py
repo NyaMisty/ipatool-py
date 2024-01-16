@@ -270,9 +270,10 @@ class IPATool(object):
             session_cache = os.path.join(args.session_dir, args.appleid) if args.session_dir else None
             if session_cache and os.path.exists(session_cache):
                 needLogin = False
-                with open(session_cache, "r") as f:
-                    content = f.read()
                 try:
+                    # inside try in case the file format changed
+                    with open(session_cache, "r") as f:
+                        content = f.read()
                     Store.authenticate_load_session(content)
                 except Exception as e:
                     logger.warning(f"Error loading session {session_cache}")
