@@ -426,16 +426,19 @@ class IPATool(object):
                     raise Exception("failed to find appContentDir, choices %s", appContentDirChoices)
                 appContentDir = appContentDirChoices[0].rstrip('/')
 
+                processedSinf = False
                 if (appContentDir + '/SC_Info/Manifest.plist') in ipaFile.namelist():
                     #Try to get the Manifest.plist file, since it doesn't always exist.
                     scManifestData = ipaFile.read(appContentDir + '/SC_Info/Manifest.plist')
                     logger.debug("Got SC_Info/Manifest.plist: %s", scManifestData)
                     scManifest = plistlib.loads(scManifestData)
                     sinfs = {c.id: c.sinf for c in downInfo.sinfs}
-                    for i, sinfPath in enumerate(scManifest['SinfPaths']):
-                        logger.debug("Writing sinf to %s", sinfPath)
-                        ipaFile.writestr(appContentDir + '/' + sinfPath, sinfs[i])
-                else:
+                    if 'SinfPaths' in scManifest:
+                        for i, sinfPath in enumerate(scManifest['SinfPaths']):
+                            logger.debug("Writing sinf to %s", sinfPath)
+                            ipaFile.writestr(appContentDir + '/' + sinfPath, sinfs[i])
+                        processedSinf = True
+                if not processedSinf:
                     logger.info('Manifest.plist does not exist! Assuming it is an old app without one...')
                     infoListData = ipaFile.read(appContentDir + '/Info.plist') #Is this not loaded anywhere yet?
                     infoList = plistlib.loads(infoListData)
@@ -443,6 +446,7 @@ class IPATool(object):
                     logger.debug("Writing sinf to %s", sinfPath)
                     #Assuming there is only one .sinf file, hence the 0
                     ipaFile.writestr(sinfPath, downInfo.sinfs[0].sinf)
+                    processedSinf = True
 
             logger.info("Downloaded ipa to %s" % filename)
 
