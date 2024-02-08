@@ -105,6 +105,13 @@ class IPATool(object):
         )
         self.sess.mount("https://", HTTPAdapter(max_retries=retry_strategy))
         self.sess.mount("http://", HTTPAdapter(max_retries=retry_strategy))
+        IPATOOL_PROXY = os.getenv("IPATOOL_PROXY")
+        if IPATOOL_PROXY is not None:
+            self.sess.proxies.update(
+                {'http': IPATOOL_PROXY, 'https': IPATOOL_PROXY})
+            # self.sess.headers = {}
+            self.sess.headers = {"Connection": "close"}
+            self.sess.keep_alive = False
 
         self.appId = None
         # self.appInfo = None
