@@ -161,6 +161,7 @@ class IPATool(object):
         his_p = subp.add_parser('historyver')
         his_p.add_argument('--appId', '-i', dest='appId')
         his_p.add_argument('--purchase', action='store_true')
+        his_p.add_argument('--output-dir', '-o', dest='output_dir', default='.')
         add_auth_options(his_p)
         his_p.set_defaults(func=self.handleHistoryVersion)
 
@@ -322,7 +323,7 @@ class IPATool(object):
             else:
                 raise
 
-    def handleHistoryVersion(self, args):
+    def handleHistoryVersion(self, args, caches=True):
         if args.appId:
             self.appId = args.appId
 
@@ -330,13 +331,33 @@ class IPATool(object):
             logger.fatal("appId not supplied!")
             return
 
+        versionsJsonPath = args.output_dir + f"/historyver_{self.appId}.json"
+        if caches:
+            if os.path.exists(versionsJsonPath):
+                cacheContent = None
+                try:
+                    with open(versionsJsonPath) as f:
+                        cacheContent = json.load(f)
+                except:
+                    pass
+                if cacheContent is not None:
+                    logger.info('Loaded history version cache for appId %s' % self.appId)
+                    self.appVerIds = cacheContent['appVerIds']
+                    return
+
         logger.info('Retriving history version for appId %s' % self.appId)
 
         try:
             Store = self._get_StoreClient(args)
 
             logger.info('Retriving download info for appId %s' % (self.appId))
-            downResp = Store.download(self.appId, isRedownload=not args.purchase)
+            if args.purchase:
+                logger.info('Purchasing appId %s' % (self.appId))
+                # We have already successfully purchased, so don't purchase again :)
+                self.handlePurchase(args)
+                args.purchase = False
+
+            downResp = Store.download(self.appId, '', isRedownload=not args.purchase)
             logger.debug('Got download info: %s', downResp)
             if args.purchase:
                 # We have already successfully purchased, so don't purchase again :)
@@ -351,23 +372,59 @@ class IPATool(object):
                 "appVerIds": downInfo.metadata.softwareVersionExternalIdentifiers
             })
             self.appVerIds = downInfo.metadata.softwareVersionExternalIdentifiers
+            if caches:
+                with open(versionsJsonPath, 'w') as f:
+                    json.dump({
+                        'appVerIds': self.appVerIds,
+                    }, f)
         except StoreException as e:
             self._handleStoreException(e)
+            if not e.errMsg.startswith('http error status') and not e.errMsg.startswith(
+                    'We are temporarily unable to process your request') and not e.errMsg.startswith(
+                    "License not found"):
+                # this error is persistent (e.g. app deleted)
+                self.appVerIds = []
+                if caches:
+                    with open(versionsJsonPath, 'w') as f:
+                        json.dump({
+                            'appVerIds': self.appVerIds,
+                            'error': str(e),
+                            'errorResp': str(e.resp),
+                        }, f)
 
     def handleDownload(self, args):
+        os.makedirs(args.output_dir, exist_ok=True)
         if args.downloadAllVersion:
-            self.handleHistoryVersion(args)
+            if os.path.exists(args.output_dir + "/all_done"):
+                logger.info('Already fully finished, skipping!')
+                return
+            self.handleHistoryVersion(args, caches=True)
+            if not self.appVerIds:
+                logger.fatal('failed to retrive history versions for appId %s', args.appId)
+                return
+            everything_succ = True
             for appVerId in self.appVerIds:
                 self.jsonOut = None
+                stateFile = args.output_dir + '/' + str(appVerId) + '.finish'
+                if os.path.exists(stateFile):
+                    logger.info('Skipping already downloaded')
+                    continue
                 try:
                     self.appVerId = appVerId
                     self.downloadOne(args)
                     if args.out_json and self.jsonOut:
                         print(json.dumps(self.jsonOut, ensure_ascii=False))
+                    if self.jsonOut is not None:  # successfully finished
+                        with open(stateFile, 'w') as f:
+                            f.write('1')
                 except Exception as e:
-                    logger.fatal("error during downloading appVerId %s", appVerId)
+                    logger.fatal("error during downloading appVerId %s", appVerId, exc_info=1)
+                    everything_succ = False
                 finally:
                     self.jsonOut = None
+            if everything_succ:
+                with open(args.output_dir + "/all_done", 'w') as f:
+                    f.write("1")
         else:
             self.downloadOne(args)
 
