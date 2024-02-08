@@ -60,7 +60,7 @@ def downloadFile(url, outfile, retries=10):
 
 download_sess = requests.Session()
 download_sess.headers = {"User-Agent": CONFIGURATOR_UA}
-DOWNLOAD_READ_TIMEOUT = 60.0
+DOWNLOAD_READ_TIMEOUT = 25.0
 def _downloadFile(url, outfile):
     with download_sess.get(url, stream=True, timeout=DOWNLOAD_READ_TIMEOUT) as r:
         if not r.headers.get('Content-Length'):
@@ -95,8 +95,13 @@ class IPATool(object):
 
         retry_strategy = Retry(
             connect=4,
-            read=2,
-            total=8,
+            read=4,
+            # total=8,
+            status=20,
+            allowed_methods=None,
+            status_forcelist=[429, 502, 503],
+            backoff_factor=1.0,
+            respect_retry_after_header=False,
         )
         self.sess.mount("https://", HTTPAdapter(max_retries=retry_strategy))
         self.sess.mount("http://", HTTPAdapter(max_retries=retry_strategy))
