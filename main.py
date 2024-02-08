@@ -10,6 +10,10 @@ from urllib3 import Retry
 
 from reqs.itunes import *
 from reqs.store import *
+import reprlib
+
+reprlib.aRepr.maxstring = 200
+
 import argparse
 
 import logging
@@ -18,6 +22,8 @@ from rich.console import Console
 import rich
 
 rich.get_console().file = sys.stderr
+if rich.get_console().width < 100:
+    rich.get_console().width = 100
 
 logging_handler = RichHandler(rich_tracebacks=True)
 logging.basicConfig(
@@ -27,6 +33,11 @@ logging.basicConfig(
     handlers=[logging_handler]
 )
 logging.getLogger('urllib3').setLevel(logging.WARNING)
+retryLogger = logging.getLogger('urllib3.util.retry')
+retryLogger.setLevel(logging.DEBUG)
+retryLogger.handlers = [logging_handler]
+retryLogger.propagate = False
+
 logger = logging.getLogger('main')
 
 import requests
@@ -68,7 +79,7 @@ def _downloadFile(url, outfile):
                     downLen += len(chunk)
                     if totalLen and downLen - lastLen > totalLen * 0.05:
                         logger.info("Download progress: %3.2f%% (%5.1fM /%5.1fM)" % (
-                        downLen / totalLen * 100, downLen / 1024 / 1024, totalLen / 1024 / 1024))
+                            downLen / totalLen * 100, downLen / 1024 / 1024, totalLen / 1024 / 1024))
                         lastLen = downLen
         finally:
             if downLen != totalLen: # ensure no partial downloaded files exists
@@ -217,9 +228,12 @@ class IPATool(object):
             logger.info("Using iTunes interface %s to download app!" % args.itunes_server)
             servUrl = args.itunes_server
             def handle_iTunes_provider(url):
+                startTime = time.time()
                 r = requests.get(servUrl, params={
                     'url': url
                 })
+                logger.debug("got itunes header in %.2f seconds", time.time() - startTime)
+
                 ret = r.json()
                 kbsync = bytes.fromhex(ret.pop('kbsync'))
                 guid = ret.pop('guid')
