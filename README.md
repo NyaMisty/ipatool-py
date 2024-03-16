@@ -110,3 +110,7 @@ python3 main.py --json download --itunes-server http://XXX.XXX.XXX.XXX:9000 --ap
 ## Credit
 
 - Thanks @majd's ipatool, which is written in swift
+
+## License
+
+ipatool-py is released under the [MIT license](https://github.com/majd/ipatool/blob/main/LICENSE).
