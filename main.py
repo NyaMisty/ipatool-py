@@ -10,6 +10,10 @@ from urllib3 import Retry
 
 from reqs.itunes import *
 from reqs.store import *
+import reprlib
+
+reprlib.aRepr.maxstring = 200
+
 import argparse
 
 import logging
@@ -18,6 +22,8 @@ from rich.console import Console
 import rich
 
 rich.get_console().file = sys.stderr
+if rich.get_console().width < 100:
+    rich.get_console().width = 100
 
 logging_handler = RichHandler(rich_tracebacks=True)
 logging.basicConfig(
@@ -27,6 +33,11 @@ logging.basicConfig(
     handlers=[logging_handler]
 )
 logging.getLogger('urllib3').setLevel(logging.WARNING)
+retryLogger = logging.getLogger('urllib3.util.retry')
+retryLogger.setLevel(logging.DEBUG)
+retryLogger.handlers = [logging_handler]
+retryLogger.propagate = False
+
 logger = logging.getLogger('main')
 
 import requests
@@ -49,7 +60,7 @@ def downloadFile(url, outfile, retries=10):
 
 download_sess = requests.Session()
 download_sess.headers = {"User-Agent": CONFIGURATOR_UA}
-DOWNLOAD_READ_TIMEOUT = 60.0
+DOWNLOAD_READ_TIMEOUT = 25.0
 def _downloadFile(url, outfile):
     with download_sess.get(url, stream=True, timeout=DOWNLOAD_READ_TIMEOUT) as r:
         if not r.headers.get('Content-Length'):
@@ -68,7 +79,7 @@ def _downloadFile(url, outfile):
                     downLen += len(chunk)
                     if totalLen and downLen - lastLen > totalLen * 0.05:
                         logger.info("Download progress: %3.2f%% (%5.1fM /%5.1fM)" % (
-                        downLen / totalLen * 100, downLen / 1024 / 1024, totalLen / 1024 / 1024))
+                            downLen / totalLen * 100, downLen / 1024 / 1024, totalLen / 1024 / 1024))
                         lastLen = downLen
         finally:
             if downLen != totalLen: # ensure no partial downloaded files exists
@@ -84,11 +95,23 @@ class IPATool(object):
 
         retry_strategy = Retry(
             connect=4,
-            read=2,
-            total=8,
+            read=4,
+            # total=8,
+            status=20,
+            allowed_methods=None,
+            status_forcelist=[429, 502, 503],
+            backoff_factor=1.0,
+            respect_retry_after_header=False,
         )
         self.sess.mount("https://", HTTPAdapter(max_retries=retry_strategy))
         self.sess.mount("http://", HTTPAdapter(max_retries=retry_strategy))
+        IPATOOL_PROXY = os.getenv("IPATOOL_PROXY")
+        if IPATOOL_PROXY is not None:
+            self.sess.proxies.update(
+                {'http': IPATOOL_PROXY, 'https': IPATOOL_PROXY})
+            # self.sess.headers = {}
+            self.sess.headers = {"Connection": "close"}
+            self.sess.keep_alive = False
 
         self.appId = None
         # self.appInfo = None
@@ -145,6 +168,7 @@ class IPATool(object):
         his_p = subp.add_parser('historyver')
         his_p.add_argument('--appId', '-i', dest='appId')
         his_p.add_argument('--purchase', action='store_true')
+        his_p.add_argument('--output-dir', '-o', dest='output_dir', default='.')
         add_auth_options(his_p)
         his_p.set_defaults(func=self.handleHistoryVersion)
 
@@ -195,7 +219,7 @@ class IPATool(object):
         }
 
         if args.get_verid:
-            logger.info("Retriving verId using iTunes webpage...")
+            logger.info("Retrieving verId using iTunes webpage...")
             verId = iTunes.getAppVerId(self.appId, args.country)
             logger.info("Got current verId using iTunes webpage: %s" % verId)
             ret["appVerId"] = verId
@@ -204,7 +228,7 @@ class IPATool(object):
 
     storeClientCache = {}
     def _get_StoreClient(self, args):
-        for k, v in self.storeClientCache:
+        for k, v in self.storeClientCache.items():
             if time.time() - v < 30.0:
                 return k
             else:
@@ -217,9 +241,12 @@ class IPATool(object):
             logger.info("Using iTunes interface %s to download app!" % args.itunes_server)
             servUrl = args.itunes_server
             def handle_iTunes_provider(url):
+                startTime = time.time()
                 r = requests.get(servUrl, params={
                     'url': url
                 })
+                logger.debug("got itunes header in %.2f seconds", time.time() - startTime)
+
                 ret = r.json()
                 kbsync = bytes.fromhex(ret.pop('kbsync'))
                 guid = ret.pop('guid')
@@ -243,9 +270,10 @@ class IPATool(object):
             session_cache = os.path.join(args.session_dir, args.appleid) if args.session_dir else None
             if session_cache and os.path.exists(session_cache):
                 needLogin = False
-                with open(session_cache, "r") as f:
-                    content = f.read()
                 try:
+                    # inside try in case the file format changed
+                    with open(session_cache, "r") as f:
+                        content = f.read()
                     Store.authenticate_load_session(content)
                 except Exception as e:
                     logger.warning(f"Error loading session {session_cache}")
@@ -285,6 +313,7 @@ class IPATool(object):
             Store.sess.original_post = Store.sess.post
             Store.sess.post = authedPost
 
+        self.storeClientCache[Store] = time.time()
         return Store
 
     def _handleStoreException(self, _e):
@@ -294,7 +323,7 @@ class IPATool(object):
 
     def handlePurchase(self, args):
         Store = self._get_StoreClient(args)
-        logger.info('Try to purchasing appId %s' % (self.appId))
+        logger.info('Try to purchase appId %s' % (self.appId))
         try:
             Store.purchase(self.appId)
         except StoreException as e:
@@ -303,7 +332,7 @@ class IPATool(object):
             else:
                 raise
 
-    def handleHistoryVersion(self, args):
+    def handleHistoryVersion(self, args, caches=True):
         if args.appId:
             self.appId = args.appId
 
@@ -311,13 +340,33 @@ class IPATool(object):
             logger.fatal("appId not supplied!")
             return
 
-        logger.info('Retriving history version for appId %s' % self.appId)
+        versionsJsonPath = args.output_dir + f"/historyver_{self.appId}.json"
+        if caches:
+            if os.path.exists(versionsJsonPath):
+                cacheContent = None
+                try:
+                    with open(versionsJsonPath) as f:
+                        cacheContent = json.load(f)
+                except:
+                    pass
+                if cacheContent is not None:
+                    logger.info('Loaded history version cache for appId %s' % self.appId)
+                    self.appVerIds = cacheContent['appVerIds']
+                    return
+
+        logger.info('Retrieving history version for appId %s' % self.appId)
 
         try:
             Store = self._get_StoreClient(args)
 
-            logger.info('Retriving download info for appId %s' % (self.appId))
-            downResp = Store.download(self.appId, isRedownload=not args.purchase)
+            logger.info('Retrieving download info for appId %s' % (self.appId))
+            if args.purchase:
+                logger.info('Purchasing appId %s' % (self.appId))
+                # We have already successfully purchased, so don't purchase again :)
+                self.handlePurchase(args)
+                args.purchase = False
+
+            downResp = Store.download(self.appId, '', isRedownload=not args.purchase)
             logger.debug('Got download info: %s', downResp)
             if args.purchase:
                 # We have already successfully purchased, so don't purchase again :)
@@ -332,23 +381,59 @@ class IPATool(object):
                 "appVerIds": downInfo.metadata.softwareVersionExternalIdentifiers
             })
             self.appVerIds = downInfo.metadata.softwareVersionExternalIdentifiers
+            if caches:
+                with open(versionsJsonPath, 'w') as f:
+                    json.dump({
+                        'appVerIds': self.appVerIds,
+                    }, f)
         except StoreException as e:
             self._handleStoreException(e)
+            if not e.errMsg.startswith('http error status') and not e.errMsg.startswith(
+                    'We are temporarily unable to process your request') and not e.errMsg.startswith(
+                    "License not found"):
+                # this error is persistent (e.g. app deleted)
+                self.appVerIds = []
+                if caches:
+                    with open(versionsJsonPath, 'w') as f:
+                        json.dump({
+                            'appVerIds': self.appVerIds,
+                            'error': str(e),
+                            'errorResp': str(e.resp),
+                        }, f)
 
     def handleDownload(self, args):
+        os.makedirs(args.output_dir, exist_ok=True)
         if args.downloadAllVersion:
-            self.handleHistoryVersion(args)
+            if os.path.exists(args.output_dir + "/all_done"):
+                logger.info('Already fully finished, skipping!')
+                return
+            self.handleHistoryVersion(args, caches=True)
+            if not self.appVerIds:
+                logger.fatal('failed to retrive history versions for appId %s', args.appId)
+                return
+            everything_succ = True
             for appVerId in self.appVerIds:
                 self.jsonOut = None
+                stateFile = args.output_dir + '/' + str(appVerId) + '.finish'
+                if os.path.exists(stateFile):
+                    logger.info('Skipping already downloaded')
+                    continue
                 try:
                     self.appVerId = appVerId
                     self.downloadOne(args)
                     if args.out_json and self.jsonOut:
                         print(json.dumps(self.jsonOut, ensure_ascii=False))
+                    if self.jsonOut is not None:  # successfully finished
+                        with open(stateFile, 'w') as f:
+                            f.write('1')
                 except Exception as e:
-                    logger.fatal("error during downloading appVerId %s", appVerId)
+                    logger.fatal("error during downloading appVerId %s", appVerId, exc_info=1)
+                    everything_succ = False
                 finally:
                     self.jsonOut = None
+            if everything_succ:
+                with open(args.output_dir + "/all_done", 'w') as f:
+                    f.write("1")
         else:
             self.downloadOne(args)
 
@@ -370,7 +455,7 @@ class IPATool(object):
             if args.purchase:
                 self.handlePurchase(args)
             
-            logger.info('Retriving download info for appId %s%s' % (self.appId, " with versionId %s" % self.appVerId if self.appVerId else ""))
+            logger.info('Retrieving download info for appId %s%s' % (self.appId, " with versionId %s" % self.appVerId if self.appVerId else ""))
 
             downResp = Store.download(self.appId, self.appVerId, isRedownload=not args.purchase)
             logger.debug('Got download info: %s', downResp.as_dict())
@@ -401,54 +486,63 @@ class IPATool(object):
             filepath = os.path.join(args.output_dir, filename)
             logger.info("Downloading ipa to %s" % filepath)
             downloadFile(downInfo.URL, filepath)
-            with zipfile.ZipFile(filepath, 'a') as ipaFile:
-                logger.info("Writing out iTunesMetadata.plist...")
-                metadata = downInfo.metadata.as_dict()
-                if appleid:
-                    metadata["apple-id"] = appleid
-                    metadata["userName"] = appleid
-                logger.debug("Writing iTunesMetadata.plist")
-                ipaFile.writestr(zipfile.ZipInfo("iTunesMetadata.plist", get_zipinfo_datetime()), plistlib.dumps(metadata))
-                logger.debug("Writing IPAToolInfo.plist")
-                ipaFile.writestr(zipfile.ZipInfo("IPAToolInfo.plist", get_zipinfo_datetime()), plistlib.dumps(downResp.as_dict()))
+            metadata = downInfo.metadata.as_dict()
+            if appleid:
+                metadata["apple-id"] = appleid
+                metadata["userName"] = appleid
+            logger.info("Writing out iTunesMetadata.plist...")
+            if zipfile.is_zipfile(filepath):
+                with zipfile.ZipFile(filepath, 'a') as ipaFile:
+                    logger.debug("Writing iTunesMetadata.plist")
+                    ipaFile.writestr(zipfile.ZipInfo("iTunesMetadata.plist", get_zipinfo_datetime()), plistlib.dumps(metadata))
+                    logger.debug("Writing IPAToolInfo.plist")
+                    ipaFile.writestr(zipfile.ZipInfo("IPAToolInfo.plist", get_zipinfo_datetime()), plistlib.dumps(downResp.as_dict()))
 
-                def findAppContentPath(c):
-                    if not c.startswith('Payload/'):
-                        return False
-                    pathparts = c.strip('/').split('/')
-                    if len(pathparts) != 2:
-                        return False
-                    if not pathparts[1].endswith(".app"):
-                        return False
-                    return True
-                appContentDirChoices = [c for c in ipaFile.namelist() if findAppContentPath(c)]
-                if len(appContentDirChoices) != 1:
-                    raise Exception("failed to find appContentDir, choices %s", appContentDirChoices)
-                appContentDir = appContentDirChoices[0].rstrip('/')
+                    def findAppContentPath(c):
+                        if not c.startswith('Payload/'):
+                            return False
+                        pathparts = c.strip('/').split('/')
+                        if len(pathparts) != 2:
+                            return False
+                        if not pathparts[1].endswith(".app"):
+                            return False
+                        return True
+                    appContentDirChoices = [c for c in ipaFile.namelist() if findAppContentPath(c)]
+                    if len(appContentDirChoices) != 1:
+                        raise Exception("failed to find appContentDir, choices %s", appContentDirChoices)
+                    appContentDir = appContentDirChoices[0].rstrip('/')
 
-                processedSinf = False
-                if (appContentDir + '/SC_Info/Manifest.plist') in ipaFile.namelist():
-                    #Try to get the Manifest.plist file, since it doesn't always exist.
-                    scManifestData = ipaFile.read(appContentDir + '/SC_Info/Manifest.plist')
-                    logger.debug("Got SC_Info/Manifest.plist: %s", scManifestData)
-                    scManifest = plistlib.loads(scManifestData)
-                    sinfs = {c.id: c.sinf for c in downInfo.sinfs}
-                    if 'SinfPaths' in scManifest:
-                        for i, sinfPath in enumerate(scManifest['SinfPaths']):
-                            logger.debug("Writing sinf to %s", sinfPath)
-                            ipaFile.writestr(appContentDir + '/' + sinfPath, sinfs[i])
+                    processedSinf = False
+                    if (appContentDir + '/SC_Info/Manifest.plist') in ipaFile.namelist():
+                        #Try to get the Manifest.plist file, since it doesn't always exist.
+                        scManifestData = ipaFile.read(appContentDir + '/SC_Info/Manifest.plist')
+                        logger.debug("Got SC_Info/Manifest.plist: %s", scManifestData)
+                        scManifest = plistlib.loads(scManifestData)
+                        sinfs = {c.id: c.sinf for c in downInfo.sinfs}
+                        if 'SinfPaths' in scManifest:
+                            for i, sinfPath in enumerate(scManifest['SinfPaths']):
+                                logger.debug("Writing sinf to %s", sinfPath)
+                                ipaFile.writestr(appContentDir + '/' + sinfPath, sinfs[i])
+                            processedSinf = True
+                    if not processedSinf:
+                        logger.info('Manifest.plist does not exist! Assuming it is an old app without one...')
+                        infoListData = ipaFile.read(appContentDir + '/Info.plist') #Is this not loaded anywhere yet?
+                        infoList = plistlib.loads(infoListData)
+                        sinfPath = appContentDir + '/SC_Info/'+infoList['CFBundleExecutable']+".sinf"
+                        logger.debug("Writing sinf to %s", sinfPath)
+                        #Assuming there is only one .sinf file, hence the 0
+                        ipaFile.writestr(sinfPath, downInfo.sinfs[0].sinf)
                         processedSinf = True
-                if not processedSinf:
-                    logger.info('Manifest.plist does not exist! Assuming it is an old app without one...')
-                    infoListData = ipaFile.read(appContentDir + '/Info.plist') #Is this not loaded anywhere yet?
-                    infoList = plistlib.loads(infoListData)
-                    sinfPath = appContentDir + '/SC_Info/'+infoList['CFBundleExecutable']+".sinf"
-                    logger.debug("Writing sinf to %s", sinfPath)
-                    #Assuming there is only one .sinf file, hence the 0
-                    ipaFile.writestr(sinfPath, downInfo.sinfs[0].sinf)
-                    processedSinf = True
 
-            logger.info("Downloaded ipa to %s" % filename)
+                logger.info("Downloaded ipa to %s" % filename)
+            else:
+                plist = filepath[:-4]+".info.plist"
+                with open(plist, "wb") as f:
+                    f.write(plistlib.dumps(downResp.as_dict()))
+                plist = filepath[:-4]+".plist"
+                with open(plist, "wb") as f:
+                    f.write(plistlib.dumps(metadata))
+                logger.info("Downloaded ipa to %s and plist to %s" % (filename, plist))
 
             self._outputJson({
                 "appName": appName,
@@ -466,7 +560,7 @@ class IPATool(object):
 
 def main():
     tool = IPATool()
-
     tool.tool_main()
 
-main()
+if __name__ == '__main__':
+    main()
