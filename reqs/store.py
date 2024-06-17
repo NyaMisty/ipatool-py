@@ -140,7 +140,7 @@ class StoreClient(object):
     # ' \
     # https://p25-buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/volumeStoreDownloadProduct?guid=000C2941396Bk
     def volumeStoreDownloadProduct(self, appId, appVerId=""):
-        req = StoreDownloadReq(creditDisplay="", guid=self.authInfo.guid, salableAdamId=appId, appExtVrsId=appVerId)
+        req = StoreDownloadReq(creditDisplay="", guid=self.authInfo.guid, salableAdamId=appId, externalVersionId=appVerId)
         hdrs = {
                "Content-Type": "application/x-www-form-urlencoded",
                "User-Agent": CONFIGURATOR_UA,
