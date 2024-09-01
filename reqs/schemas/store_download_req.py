@@ -7,7 +7,7 @@ class StoreDownloadReq:
         "creditDisplay": {"type": str, "subtype": None},
         "guid": {"type": str, "subtype": None},
         "salableAdamId": {"type": str, "subtype": None},
-        "appExtVrsId": {"type": str, "subtype": None},
+        "externalVersionId": {"type": str, "subtype": None},
     }
     _formats_map = {}
     _validations_map = {
@@ -20,7 +20,7 @@ class StoreDownloadReq:
         "salableAdamId": {
             "required": True,
         },
-        "appExtVrsId": {
+        "externalVersionId": {
             "required": False,
         },
     }
@@ -30,13 +30,13 @@ class StoreDownloadReq:
         creditDisplay: str = None,
         guid: str = None,
         salableAdamId: str = None,
-        appExtVrsId: str = None,
+        externalVersionId: str = None,
     ):
         pass
         self.__creditDisplay = creditDisplay
         self.__guid = guid
         self.__salableAdamId = salableAdamId
-        self.__appExtVrsId = appExtVrsId
+        self.__externalVersionId = externalVersionId
 
     def _get_creditDisplay(self):
         return self.__creditDisplay
@@ -71,16 +71,16 @@ class StoreDownloadReq:
 
     salableAdamId = property(_get_salableAdamId, _set_salableAdamId)
 
-    def _get_appExtVrsId(self):
-        return self.__appExtVrsId
+    def _get_externalVersionId(self):
+        return self.__externalVersionId
 
-    def _set_appExtVrsId(self, value):
+    def _set_externalVersionId(self, value):
         if value is not None and not isinstance(value, str):
-            raise TypeError("appExtVrsId must be str")
+            raise TypeError("externalVersionId must be str")
 
-        self.__appExtVrsId = value
+        self.__externalVersionId = value
 
-    appExtVrsId = property(_get_appExtVrsId, _set_appExtVrsId)
+    externalVersionId = property(_get_externalVersionId, _set_externalVersionId)
 
     @staticmethod
     def from_dict(d):
@@ -101,11 +101,11 @@ class StoreDownloadReq:
                 if hasattr(str, "from_dict")
                 else d["salableAdamId"]
             )
-        if "appExtVrsId" in d:
-            v["appExtVrsId"] = (
-                str.from_dict(d["appExtVrsId"])
+        if "externalVersionId" in d:
+            v["externalVersionId"] = (
+                str.from_dict(d["externalVersionId"])
                 if hasattr(str, "from_dict")
-                else d["appExtVrsId"]
+                else d["externalVersionId"]
             )
         return StoreDownloadReq(**v)
 
@@ -129,16 +129,16 @@ class StoreDownloadReq:
                 if hasattr(self.__salableAdamId, "as_dict")
                 else self.__salableAdamId
             )
-        if self.__appExtVrsId is not None:
-            d["appExtVrsId"] = (
-                self.__appExtVrsId.as_dict()
-                if hasattr(self.__appExtVrsId, "as_dict")
-                else self.__appExtVrsId
+        if self.__externalVersionId is not None:
+            d["externalVersionId"] = (
+                self.__externalVersionId.as_dict()
+                if hasattr(self.__externalVersionId, "as_dict")
+                else self.__externalVersionId
             )
         return d
 
     def __repr__(self):
-        return "<Class StoreDownloadReq. creditDisplay: {}, guid: {}, salableAdamId: {}, appExtVrsId: {}>".format(
+        return "<Class StoreDownloadReq. creditDisplay: {}, guid: {}, salableAdamId: {}, externalVersionId: {}>".format(
             limitedRepr(
                 self.__creditDisplay[:20]
                 if isinstance(self.__creditDisplay, bytes)
@@ -153,8 +153,8 @@ class StoreDownloadReq:
                 else self.__salableAdamId
             ),
             limitedRepr(
-                self.__appExtVrsId[:20]
-                if isinstance(self.__appExtVrsId, bytes)
-                else self.__appExtVrsId
+                self.__externalVersionId[:20]
+                if isinstance(self.__externalVersionId, bytes)
+                else self.__externalVersionId
             ),
         )
