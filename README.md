@@ -58,7 +58,7 @@ After setting up the server, you can run this tool to download a specific versio
 python3 main.py lookup -b com.touchingapp.potatsolite -c JP download -s http://127.0.0.1:9000 --appVerId 833889087
 ```
 
-NOTE: Some users are reporting that you need to **authorize computer** and make first purchase in iTunes with marked "do not ask for password" before using the iTunes server. (See #26)
+NOTE: Some users are reporting that you need to **authorize computer** and make first purchase in iTunes with marked "do not ask for password" before using the iTunes server. (See [#26](https://github.com/NyaMisty/ipatool-py/issues/26))
 
 ### Get History Ver (usually used together with JSON)
 
