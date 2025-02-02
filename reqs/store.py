@@ -145,7 +145,7 @@ class StoreClient(object):
                "Content-Type": "application/x-www-form-urlencoded",
                "User-Agent": CONFIGURATOR_UA,
            }
-        url = "https://p25-buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/volumeStoreDownloadProduct?guid=%s" % self.authInfo.guid
+        url = "https://p71-buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/volumeStoreDownloadProduct?guid=%s" % self.authInfo.guid
         payload = req.as_dict()
         r = self.sess.post(url,
                            headers=hdrs,
@@ -158,7 +158,7 @@ class StoreClient(object):
 
     def buyProduct(self, appId, appVer='', productType='C', pricingParameters='STDQ'):
         # STDQ - buy, STDRDL - redownload, SWUPD - update
-        url = "https://p25-buy.itunes.apple.com/WebObjects/MZBuy.woa/wa/buyProduct"
+        url = "https://p71-buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/buyProduct"
         
         itunes_internal = self.iTunes_provider(url)
         hdrs = itunes_internal.pop('headers')
@@ -207,7 +207,7 @@ class StoreClient(object):
         return resp
 
     def buyProduct_purchase(self, appId, productType='C'):
-        url = "https://buy.itunes.apple.com/WebObjects/MZBuy.woa/wa/buyProduct"
+        url = "https://buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/buyProduct"
         req = StoreBuyproductReq(
             guid=self.authInfo.guid,
             salableAdamId=str(appId),
