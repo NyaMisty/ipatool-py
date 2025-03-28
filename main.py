@@ -228,12 +228,14 @@ class IPATool(object):
 
     storeClientCache = {}
     def _get_StoreClient(self, args):
+        to_delete = []
         for k, v in self.storeClientCache.items():
             if time.time() - v < 30.0:
                 return k
             else:
-                del self.storeClientCache[k]
-
+                to_delete.append(k)
+        for k in to_delete:
+            self.storeClientCache.pop(k)
         newSess = pickle.loads(pickle.dumps(self.sess))
         Store = StoreClient(newSess)
 
