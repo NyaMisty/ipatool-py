@@ -44,7 +44,7 @@ Old versions must be downloaded together with `iTunes Server`. You can get `iTun
     - download this repo: https://github.com/NyaMisty/actions-iTunes-header
     - install iTunes 12.6.5.3, from https://secure-appldnld.apple.com/itunes12/091-87819-20180912-69177170-B085-11E8-B6AB-C1D03409AD2A6/iTunes64Setup.exe
     - patch the iTunes using `actions-iTunes-header/workflow_helper/iTunesInstall/patch_itunes.py`
-    - install frida: `pip3 install frida`
+    - install frida: `pip3 install frida` and flask `pip3 install flask`
     - open iTunes, sign out & re-login your account
     - run: `actions-iTunes-header/workflow_helper/iTunesDownload/get_header.py`
 - Manually way with jailbroken iOS device: (supports 2FA)
