@@ -207,7 +207,7 @@ class IPATool(object):
             logger.fatal("Failed to find app in country %s with %s" % (args.country, s))
             return
         appInfo = appInfos.results[0]
-        logger.info("Found app:\n\tName: %s\n\tVersion: %s\n\tbundleId: %s\n\tappId: %s" % (appInfo.trackName, appInfo.version, appInfo.bundleId, appInfo.trackId))
+        logger.info("Found app:\n\tName: %s\n\tVersion: %s\n\tbundleId: %s\n\tappId: %s\n\tminimumOsVersion: %s" % (appInfo.trackName, appInfo.version, appInfo.bundleId, appInfo.trackId, appInfo.minimumOsVersion))
         self.appId = appInfo.trackId
         # self.appInfo = appInfo
 
