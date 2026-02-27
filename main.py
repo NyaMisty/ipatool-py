@@ -300,7 +300,7 @@ class IPATool(object):
                     r = Store.sess.original_post(*args, **kwargs)
                     isAuthFail = False
                     try:
-                        d = plistlib.loads(r.content)
+                        d = parse_plist_payload(r.content)
                         if str(d['failureType']) in ("2034", "1008"):
                             isAuthFail = True
                     except:
